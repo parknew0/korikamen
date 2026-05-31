@@ -1,0 +1,49 @@
+# ==================================
+# macOS 시스템 파일
+# ==================================
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# ==================================
+# Xcode 개인 설정 및 상태 (핵심 방어 대상)
+# ==================================
+xcuserdata/
+*.xcuserstate
+*.pbxuser
+*.mode1v3
+*.mode2v3
+*.perspectivev3
+
+# ==================================
+# Xcode 빌드 결과물 및 임시 파일
+# ==================================
+build/
+DerivedData/
+*.moved-aside
+*.xccheckout
+*.xcscmblueprint
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# ==================================
+# Swift Package Manager (SPM)
+# ==================================
+.build/
+.swiftpm/xcode/xcuserdata/
+.swiftpm/xcode/workspace-state.json
+
+# ==================================
+# CocoaPods (나중에 외부 라이브러리 쓸 경우 대비)
+# ==================================
+Pods/
+# Podfile.lock은 버전 고정을 위해 보통 포함시키므로 무시하지 않습니다.
+
+# ==================================
+# 자동 생성되는 문서나 충돌 로그
+# ==================================
+*.swp
+*~.nib
+crashlytics-build.properties
