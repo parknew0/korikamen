@@ -1,4 +1,4 @@
-````mermaid
+```mermaid
 flowchart TD
     Start([스테이지 1 시작]) --> Hover[Hover로 드릴 조준]
     
