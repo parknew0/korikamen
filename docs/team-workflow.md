@@ -39,6 +39,41 @@
 | **Step 2** | 병렬 | 입력 담당: `RealPencilFeeder`+CommonUI / 스테이지 3명: `MockPencilFeeder` 끼고 각자 개발 (서로 안 막힘) |
 | **Step 3** | 통합 | 목 → 실제 어댑터 교체, 실기기 테스트. 척추가 있으니 *끼우기만* 하면 됨 |
 
+### 작업 구조 한눈에 — 팬아웃 · 팬인
+
+위 단계를 구조로 보면, **계약(2단계)에서 4갈래로 갈라져(FAN-OUT) 병렬 개발**하고 끝에서 **통합으로 모인다(FAN-IN)**. 단, 워킹 스켈레톤이 통합 슬롯을 미리 만들어두므로 이 팬인은 빅뱅 머지가 아니라 **각자 독립적으로 꽂는 점진 통합**이다.
+
+```mermaid
+flowchart LR
+    P0["0 · 합의 + 역할 확정<br/>(공통 토대 담당 정하기)"]
+    P1["1 · 워킹 스켈레톤<br/>SwiftUI 전환 · GameManager · 빈 스테이지뷰"]
+    P2["2 · 계약 코드화<br/>PencilState · Mock · 공통UI · onClear"]
+    P0 --> P1
+    P1 --> P2
+
+    P2 ==>|FAN-OUT| S1["Stage1 관 돌 부수기<br/>맥스"]
+    P2 ==>|FAN-OUT| S2["Stage2 자물쇠 따기<br/>실라 (+ 기획서)"]
+    P2 ==>|FAN-OUT| S3["Stage3 거미줄 제거<br/>노튼"]
+    P2 ==>|FAN-OUT| PA["RealPencilFeeder<br/>실제 펜슬 입력 · 입력담당"]
+
+    S1 ==>|FAN-IN| INT["4 · 통합<br/>Mock → Real 교체"]
+    S2 ==>|FAN-IN| INT
+    S3 ==>|FAN-IN| INT
+    PA ==>|FAN-IN| INT
+
+    INT --> TEST["실기기 + 펜슬 테스트"]
+    TEST --> DONE([게임 완성])
+
+    classDef spine fill:#eef2ff,stroke:#446,color:#224
+    classDef hub fill:#e0e7ff,stroke:#4f46e5,color:#1e3a8a,stroke-width:2px
+    classDef parallel fill:#fff6e0,stroke:#ca0,color:#840
+    classDef done fill:#e0f5e0,stroke:#3a3,color:#060
+    class P0,P1,TEST spine
+    class P2,INT hub
+    class S1,S2,S3,PA parallel
+    class DONE done
+```
+
 ## 4. 디바이스 의존성 메모
 
 애플펜슬프로 기능(Squeeze·BarrelRoll·Tilt·Pressure)은 **실기기+펜슬에서만** 진짜 테스트된다. 그래서 입력을 `PencilState`로 분리해 **시뮬레이터+목으로 게임 로직 대부분을 개발**하고, 실기기는 입력 어댑터·최종 통합 때만 사용한다.
