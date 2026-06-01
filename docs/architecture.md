@@ -96,3 +96,23 @@ final class GameManager: ObservableObject {
 2. 진실의 원천은 `machine` 하나. `phase`는 각 state의 `didEnter`에서만 갱신.
 3. 스테이지 뷰는 `init(onClear:onFail:)` 계약으로 통일 → `docs/contracts`.
 4. (참고) 3스테이지 선형이라 `GKStateMachine`은 다소 무겁지만, GameplayKit 학습 + 전환 규칙 명시화 이점이 있어 채택.
+
+## 6. 의존 구조 — 펜슬 입력 계약으로의 수렴 (팬인)
+
+작업은 병렬로 갈라지지만(→ `team-workflow.md`의 팬아웃), **구조적으로는 세 스테이지가 모두 `PencilState` 계약 하나에 의존**한다. 이 단일 수렴점이 진짜 FAN-IN이며, `Mock → Real` 교체는 3스테이지의 *공통 의존*이라 한 번에 셋 모두에 영향을 준다. 그래서 **계약을 정밀하게 유지하는 게 통합 위험을 막는 핵심**이다. (계약 상세: `contracts/pencil-input.md`)
+
+```mermaid
+flowchart TD
+    S1["Stage1 · 맥스"] --> PS
+    S2["Stage2 · 실라"] --> PS
+    S3["Stage3 · 노튼"] --> PS
+    PS["PencilState 계약<br/>(3스테이지가 의존하는 단일 수렴점 = FAN-IN)"]
+    PS --> FEED["Feeder (교체 가능)<br/>MockPencilFeeder → RealPencilFeeder"]
+
+    classDef stage fill:#fff6e0,stroke:#ca0,color:#840
+    classDef hub fill:#e0e7ff,stroke:#4f46e5,color:#1e3a8a,stroke-width:2px
+    classDef feeder fill:#eef2ff,stroke:#446,color:#224
+    class S1,S2,S3 stage
+    class PS hub
+    class FEED feeder
+```
