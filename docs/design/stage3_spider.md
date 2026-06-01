@@ -1,3 +1,4 @@
+```mermaid
 flowchart TD
     START([● START]) --> startTimer["startTimer()\n90초 카운트 시작"]
 
@@ -80,4 +81,6 @@ flowchart TD
     style OPEN          fill:#27ae60,color:#fff
     style FIRE          fill:#27ae60,color:#fff
     style STAGE_CLEAR   fill:#27ae60,color:#fff
-    style NEXT          fill:#27ae60,color:#fff 
+    style NEXT          fill:#27ae60,color:#fff
+
+```
