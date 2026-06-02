@@ -15,8 +15,8 @@ struct ContentView: View {
 
     var body: some View {
         routedView
-            .frame(maxWidth: .infinity, maxHeight: .infinity)   // 화면 가득 → 오버레이 기준이 '화면'
-            .overlay(alignment: .bottomLeading) {               // 좌측 하단에 고정
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .overlay(alignment: .bottomLeading) {
                 #if DEBUG
                 MockPencilFeeder()
                 #endif
@@ -25,10 +25,10 @@ struct ContentView: View {
 
     @ViewBuilder private var routedView: some View {
         if let failed = game.failedStage {
-            FailView(stage: failed, onRetry: game.retry)
+            FailView(stage: failed, onRetry: game.retry, onMain: game.goToMain)
         } else {
             switch game.phase {
-            case .intro:    IntroView(onContinue: game.advance)
+            case .main:     MainView(onStart: game.advance)
             case .stage(1): Stage1View(onClear: game.advance, onFail: game.fail)
             case .stage(2): Stage2View(onClear: game.advance, onFail: game.fail)
             case .stage(3): Stage3View(onClear: game.advance, onFail: game.fail)

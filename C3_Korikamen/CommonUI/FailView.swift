@@ -13,13 +13,16 @@ import SwiftUI
 struct FailView: View {
     let stage: Int
     let onRetry: () -> Void
+    let onMain: () -> Void
     var body: some View {
         VStack(spacing: 20) {
             Text("실패").font(.largeTitle).bold().foregroundStyle(.red)
             Text("스테이지 \(stage) — 시간 초과 또는 조건 미달")
                 .foregroundStyle(.secondary)
-            Button("다시 시도", action: onRetry)
-                .buttonStyle(.borderedProminent)
+            HStack(spacing: 12) {
+                Button("메인으로", action: onMain).buttonStyle(.bordered)
+                Button("다시 시도", action: onRetry).buttonStyle(.borderedProminent)
+            }
         }
         .padding()
     }
