@@ -51,7 +51,7 @@ final class Stage1Scene: SKScene {
     static let coffinScale: CGFloat = 1.0
 
     /// 알파 판정 문턱(0~255). 이 값 이상이면 '실제 그림이 있는' 픽셀로 본다.
-    private let alphaThreshold: UInt8 = 20
+    private let alphaThreshold: UInt8 = 10
 
     // MARK: - 외부 연결(뷰에서 주입)
 
@@ -372,10 +372,25 @@ final class Stage1Scene: SKScene {
         return best
     }
 
-    /// 그 지점에 '노출된 관'이 있는지(관 그림 픽셀 위 + 위를 덮은 산 돌이 없음).
-    private func coffinExposed(at p: CGPoint) -> Bool {
+    /// 그 지점에 관 그림 픽셀이 있는지(덮였는지는 따지지 않음).
+    private func coffinPixel(at p: CGPoint) -> Bool {
         guard let node = coffinNode else { return false }
         return isOpaque(node, coffinMask, center: node.position, at: p)
+    }
+
+    /// 시작 시 '돌(아무 조각이나)'이 그 지점을 덮고 있었는가. (깬 조각도 포함 → 원래 덮였던 자리 판별)
+    private func wasCoveredByRock(at p: CGPoint) -> Bool {
+        for i in pieces.indices {
+            let center = basePositions[i] ?? pieces[i].position
+            if isOpaque(pieces[i], rockMasks[i], center: center, at: p) { return true }
+        }
+        return false
+    }
+
+    /// 실패 지대: 관 픽셀이 있고 + 원래 돌이 덮었던 자리이고 + 지금은 산 돌이 없음(=깨서 노출됨).
+    /// 처음부터 있던 조각 사이 '틈'은 돌이 덮은 적 없으니 안전.
+    private func coffinDanger(at p: CGPoint) -> Bool {
+        coffinPixel(at: p) && wasCoveredByRock(at: p) && topLiveRockIndex(at: p) == nil
     }
 
     // MARK: - 디버그 터치맵
@@ -384,7 +399,7 @@ final class Stage1Scene: SKScene {
     private func removeTouchMap() { touchMapNode?.removeFromParent(); touchMapNode = nil }
 
     /// 화면 전체를 실제 판정 함수로 샘플링해 색칠한 오버레이를 만든다.
-    /// 초록=topLiveRockIndex 있음(돌 깎임), 빨강=coffinExposed(관 닿아 실패). 토글 시 1회 생성.
+    /// 초록=돌 깎임, 빨강=깨서 노출된 관(실패). 토글 시 1회 생성(돌 깬 뒤 다시 토글하면 갱신).
     private func buildTouchMap() {
         removeTouchMap()
         let W = 256, H = 192                       // 저해상 샘플(디버그용, 1회만)
@@ -397,7 +412,7 @@ final class Stage1Scene: SKScene {
                 let idx = (j * W + i) * 4
                 if topLiveRockIndex(at: p) != nil {            // 초록(안전)
                     setPixel(&buf, idx, r: 40, g: 220, b: 90, a: 120)
-                } else if coffinExposed(at: p) {              // 빨강(실패)
+                } else if coffinDanger(at: p) {               // 빨강(실패)
                     setPixel(&buf, idx, r: 235, g: 45, b: 45, a: 140)
                 }
             }
@@ -459,7 +474,7 @@ final class Stage1Scene: SKScene {
     private func updatePick(at p: CGPoint) {
         let picked = topLiveRockIndex(at: p)
         lastPicked = picked
-        lastCoffinHit = (picked == nil) && coffinExposed(at: p)
+        lastCoffinHit = (picked == nil) && coffinDanger(at: p)
         if showHitboxes {
             if let i = picked { print("👉 터치 → 돌 rock_\(String(format: "%02d", i)) 선택") }
             else if lastCoffinHit { print("👉 터치 → 노출된 관(실패 지점)") }
@@ -488,10 +503,10 @@ final class Stage1Scene: SKScene {
                 shakeOnce(id: i)                             // 타격당 1번 흔들림
                 burstDebris(at: p, color: rockColor(i))      // 타격당 파편 버스트
             }
-        } else if coffinExposed(at: p) {
+        } else if coffinDanger(at: p) {
             m.touchCoffin()
             stopDrillShake(); stopDrillDebris()
-        } else if m.tool == .drill {                          // 빈 공간으로 빠지면 드릴 효과 멈춤
+        } else if m.tool == .drill {                          // 빈 공간/안전한 틈이면 드릴 효과 멈춤
             stopDrillShake(); stopDrillDebris()
         }
     }
@@ -578,6 +593,7 @@ final class Stage1Scene: SKScene {
             .group([.fadeAlpha(to: 0, duration: 0.18), .scale(to: 0.7, duration: 0.18)]),
             .removeFromParent()
         ]))
+        if showTouchMap { buildTouchMap() }   // 깨진 조각의 초록 제거 → 아래 영역이 드러나게 갱신
     }
 
     /// 실패 연출: 화면 붉게 번쩍.
