@@ -272,7 +272,7 @@ final class Stage1Scene: SKScene {
         layer.zPosition = 900
 
         if let c = coffinNode {
-            layer.addChild(outline(rect: c.calculateAccumulatedFrame,
+            layer.addChild(outline(rect: c.calculateAccumulatedFrame(),
                                    color: lastCoffinHit ? .red : SKColor.purple,
                                    label: "관", at: c.position))
         }
