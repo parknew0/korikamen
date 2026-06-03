@@ -40,6 +40,13 @@ final class Stage1Scene: SKScene {
     /// 무더기 "전체"를 통째로 옮기는 손잡이. 이 값 하나만 바꾸면 12조각이 같이 이동.
     static let clusterOffset = CGVector(dx: 0, dy: 67)
 
+    /// 돌무더기 "뒤"에 깔리는 관 이미지. Assets에 이 이름의 png를 넣으면 자동으로 깔린다.
+    static let coffinName = "coffin"
+    /// 관 위치 미세 조정(돌무더기 중심 기준). 그림이 안 맞으면 이 값만 바꾼다.
+    static let coffinOffset = CGVector(dx: 0, dy: 0)
+    /// 관 크기 조정(1.0 = 원본).
+    static let coffinScale: CGFloat = 1.0
+
     // MARK: - 외부 연결(뷰에서 주입)
 
     /// 판정 두뇌. 씬은 이 매니저에 깨기 요청을 보내고, hp를 읽어 그림을 갱신한다.
@@ -53,6 +60,7 @@ final class Stage1Scene: SKScene {
 
     private var pieces: [SKSpriteNode] = []
     private var clearedShown = Set<Int>()      // 관 노출 연출을 이미 보여준 조각
+    private var hasCoffin = false              // 관 그림이 깔렸는지(없으면 금빛 패치로 대체)
     private var activePieceID: Int?            // 드릴로 누르고 있는 조각
     private var lastUpdate: TimeInterval = 0
 
@@ -71,7 +79,34 @@ final class Stage1Scene: SKScene {
 
     override func didMove(to view: SKView) {
         guard pieces.isEmpty else { return }   // 재진입 시 중복 생성 방지
-        buildPieces()
+        buildCoffin()                          // 먼저 관(뒤)
+        buildPieces()                          // 그 위에 돌
+    }
+
+    // MARK: - 관(배경 레이어)
+
+    /// 돌무더기 뒤(zPosition -1)에 관 그림을 깐다. 처음엔 돌에 가려 안 보이다가, 돌이 깨지면 비친다.
+    private func buildCoffin() {
+        guard let img = UIImage(named: Self.coffinName) else { return }  // png 없으면 조용히 패스
+        let node = SKSpriteNode(texture: SKTexture(image: img))
+        node.name = "coffin"
+        node.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+        node.zPosition = -1
+        node.setScale(Self.coffinScale)
+        node.position = pileCenter(extra: Self.coffinOffset)
+        addChild(node)
+        hasCoffin = true
+    }
+
+    /// 돌무더기의 대략적 중심(+추가 오프셋). 관 위치 기준점.
+    private func pileCenter(extra: CGVector = .zero) -> CGPoint {
+        guard let layout = Self.bakedLayout, !layout.isEmpty else {
+            return CGPoint(x: size.width / 2, y: size.height / 2)
+        }
+        let cx = layout.map { $0.x }.reduce(0, +) / CGFloat(layout.count)
+        let cy = layout.map { $0.y }.reduce(0, +) / CGFloat(layout.count)
+        return CGPoint(x: cx + Self.clusterOffset.dx + extra.dx,
+                       y: cy + Self.clusterOffset.dy + extra.dy)
     }
 
     // MARK: - 조각 생성
@@ -193,21 +228,27 @@ final class Stage1Scene: SKScene {
         }
     }
 
-    /// 조각이 0이 된 칸: 톡 사라졌다가 금빛 '관 노출' 패치로 바뀐다(터치 판정은 유지 → 닿으면 실패).
+    /// 조각이 0이 된 칸: 톡 깨지고 뒤의 관이 드러난다. 노드는 남겨 터치 판정 유지(닿으면 실패).
     private func revealCoffin(id: Int, node: SKSpriteNode) {
         guard !clearedShown.contains(id) else { return }
         clearedShown.insert(id)
-        let reveal = SKAction.sequence([
-            .group([.fadeAlpha(to: 0, duration: 0.15), .scale(to: 0.6, duration: 0.15)]),
-            .run { [coffinColor] in
-                node.texture = nil
-                node.color = coffinColor
-                node.colorBlendFactor = 1
-                node.setScale(1)
-            },
-            .fadeAlpha(to: 0.5, duration: 0.15)
-        ])
-        node.run(reveal)
+
+        if hasCoffin {
+            // 돌만 사라지고 뒤의 관 그림이 비친다. 투명(alpha 0)이라도 frame은 남아 터치 판정 유지.
+            node.run(.fadeAlpha(to: 0, duration: 0.2))
+        } else {
+            // 관 png가 아직 없으면 금빛 패치로 대체(위치/판정은 동일).
+            node.run(.sequence([
+                .group([.fadeAlpha(to: 0, duration: 0.15), .scale(to: 0.6, duration: 0.15)]),
+                .run { [coffinColor] in
+                    node.texture = nil
+                    node.color = coffinColor
+                    node.colorBlendFactor = 1
+                    node.setScale(1)
+                },
+                .fadeAlpha(to: 0.5, duration: 0.15)
+            ]))
+        }
     }
 
     /// 실패 연출: 화면 붉게 번쩍.
