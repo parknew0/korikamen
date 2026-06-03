@@ -58,6 +58,8 @@ final class Stage1Scene: SKScene {
     var editMode = false {
         didSet { activeTouch = nil; dragging = nil }
     }
+    /// 디버그: 히트박스/터치점/선택조각을 화면에 그린다.
+    var showHitboxes = false
 
     // MARK: - 내부 상태
 
@@ -69,6 +71,11 @@ final class Stage1Scene: SKScene {
     private var clearedShown = Set<Int>()
     private var activeTouch: CGPoint?               // 현재 누르고 있는 지점(플레이 모드)
     private var lastUpdate: TimeInterval = 0
+
+    // 디버그 시각화 상태
+    private var hitboxLayer: SKNode?
+    private var lastPicked: Int?                    // 직전 터치에서 선택된 돌
+    private var lastCoffinHit = false               // 직전 터치가 노출된 관이었는지
 
     // 배치 모드 드래그
     private var dragging: SKSpriteNode?
@@ -196,6 +203,7 @@ final class Stage1Scene: SKScene {
         }
 
         activeTouch = p
+        updatePick(at: p)                                       // 디버그: 무엇이 잡혔는지 기록
         if manager?.tool == .chisel { interact(at: p, dt: 0) }  // 끌은 누른 순간 1회
     }
 
@@ -207,12 +215,25 @@ final class Stage1Scene: SKScene {
             d.position = CGPoint(x: p.x - dragOffset.width, y: p.y - dragOffset.height)
         } else {
             activeTouch = p
+            updatePick(at: p)
+        }
+    }
+
+    /// 디버그: 현재 지점에서 뭐가 잡히는지(돌 index 또는 노출된 관) 계산해 기록 + 콘솔 출력.
+    private func updatePick(at p: CGPoint) {
+        let picked = topLiveRockIndex(at: p)
+        lastPicked = picked
+        lastCoffinHit = (picked == nil) && coffinExposed(at: p)
+        if showHitboxes {
+            if let i = picked { print("👉 터치 → 돌 rock_\(String(format: "%02d", i)) 선택") }
+            else if lastCoffinHit { print("👉 터치 → 노출된 관(실패 지점)") }
+            else { print("👉 터치 → 아무것도 없음(빈 공간)") }
         }
     }
 
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) { endTouch() }
     override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) { endTouch() }
-    private func endTouch() { dragging = nil; activeTouch = nil }
+    private func endTouch() { dragging = nil; activeTouch = nil; lastPicked = nil; lastCoffinHit = false }
 
     /// 한 지점에 도구를 적용: 산 돌이 있으면 깎고, 없고 관이 노출돼 있으면 실패.
     private func interact(at p: CGPoint, dt: TimeInterval) {
@@ -234,9 +255,59 @@ final class Stage1Scene: SKScene {
         lastUpdate = currentTime
 
         if !editMode, manager?.tool == .drill, let p = activeTouch {
+            updatePick(at: p)                  // 드릴 끌고 다닐 때 선택 갱신(디버그)
             interact(at: p, dt: dt)            // 드릴은 누르는 동안 매 프레임
         }
         refreshVisuals()
+        renderHitboxes()
+    }
+
+    /// 디버그 오버레이: 살아있는 돌 사각범위(선택=초록), 관 범위(노출 닿음=빨강), 터치점(노랑).
+    private func renderHitboxes() {
+        hitboxLayer?.removeFromParent()
+        hitboxLayer = nil
+        guard showHitboxes else { return }
+
+        let layer = SKNode()
+        layer.zPosition = 900
+
+        if let c = coffinNode {
+            layer.addChild(outline(rect: c.calculateAccumulatedFrame,
+                                   color: lastCoffinHit ? .red : SKColor.purple,
+                                   label: "관", at: c.position))
+        }
+        if let m = manager {
+            for i in pieces.indices where !m.pieces[i].isCleared {
+                let color: SKColor = (i == lastPicked) ? .green : .white
+                layer.addChild(outline(rect: pieces[i].frame,
+                                       color: color, label: "\(i)", at: pieces[i].position))
+            }
+        }
+        if let p = activeTouch {
+            let dot = SKShapeNode(circleOfRadius: 8)
+            dot.position = p
+            dot.fillColor = .yellow
+            dot.strokeColor = .black
+            layer.addChild(dot)
+        }
+        addChild(layer)
+        hitboxLayer = layer
+    }
+
+    private func outline(rect: CGRect, color: SKColor, label: String, at center: CGPoint) -> SKNode {
+        let box = SKShapeNode(rect: rect)
+        box.strokeColor = color
+        box.lineWidth = 2
+        box.fillColor = .clear
+        let tag = SKLabelNode(text: label)
+        tag.fontSize = 18
+        tag.fontColor = color
+        tag.position = center
+        tag.verticalAlignmentMode = .center
+        let g = SKNode()
+        g.addChild(box)
+        g.addChild(tag)
+        return g
     }
 
     private func refreshVisuals() {

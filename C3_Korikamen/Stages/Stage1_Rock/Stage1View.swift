@@ -17,6 +17,7 @@ struct Stage1View: View {
     @StateObject private var timer = CountdownTimer(duration: 60)   // 60초 임시값(TBD)
     @State private var scene = Stage1Scene(size: Stage1Scene.designSize)
     @State private var editMode = false
+    @State private var showHitboxes = false
 
     var body: some View {
         ZStack {
@@ -47,6 +48,7 @@ struct Stage1View: View {
             timer.start()
         }
         .onChange(of: editMode) { _, on in scene.editMode = on }
+        .onChange(of: showHitboxes) { _, on in scene.showHitboxes = on }
         .onChange(of: timer.isTimeOver) { _, over in if over { onFail() } }
         .onChange(of: manager.didClear) { _, cleared in if cleared { timer.stop(); onClear() } }
         .onChange(of: manager.didDamageCoffin) { _, hit in
@@ -76,6 +78,7 @@ struct Stage1View: View {
             Spacer()
             HStack {
                 Toggle("배치모드", isOn: $editMode).fixedSize()
+                Toggle("히트박스", isOn: $showHitboxes).fixedSize()
                 Button("좌표 출력") { scene.dumpPositions() }
                 Spacer()
                 Button("클리어 →", action: onClear)
