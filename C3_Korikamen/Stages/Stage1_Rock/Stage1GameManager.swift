@@ -64,37 +64,28 @@ final class Stage1GameManager: ObservableObject {
 
     // MARK: - 드릴 (연속) — 누르는 동안 매 tick 호출
 
-    /// pieceID 조각에 pressure(0~1) 세기로 dt(초)만큼 드릴 적용.
-    /// 이미 소멸한 칸(관 노출)이면 즉시 관 손상 → 실패 ①.
+    /// pieceID 조각에 pressure(0~1) 세기로 dt(초)만큼 드릴 적용. 이미 깬 조각은 무시.
     func drill(pieceID: Int, pressure: Double, dt: Double) {
-        guard pressure > 0, let i = index(of: pieceID) else { return }
-        if hitsCoffin(at: i) { return }
+        guard pressure > 0, let i = index(of: pieceID), !pieces[i].isCleared else { return }
         damage(at: i, amount: pressure * drillRate * dt)
     }
 
     // MARK: - 끌 (단발) — 타격마다 1회 호출
 
-    /// pieceID 조각을 끌로 1회 타격. 고정 감소.
-    /// 이미 소멸한 칸(관 노출)이면 즉시 관 손상 → 실패 ①.
+    /// pieceID 조각을 끌로 1회 타격. 고정 감소. 이미 깬 조각은 무시.
     func chisel(pieceID: Int) {
-        guard let i = index(of: pieceID) else { return }
-        if hitsCoffin(at: i) { return }
+        guard let i = index(of: pieceID), !pieces[i].isCleared else { return }
         damage(at: i, amount: chiselDamage)
     }
+
+    /// 노출된 관에 도구가 닿음 → 실패 ①.
+    /// (화면의 어느 지점이 '관'인지는 씬이 알파로 판정해서 이 함수를 호출한다.)
+    func touchCoffin() { didDamageCoffin = true }
 
     // MARK: - 내부 처리
 
     private func index(of pieceID: Int) -> Int? {
         pieces.firstIndex { $0.id == pieceID }
-    }
-
-    /// 소멸한 조각 자리(=관 노출 영역)에 도구가 닿았는가. 닿았으면 실패 플래그 set.
-    private func hitsCoffin(at i: Int) -> Bool {
-        if pieces[i].isCleared {
-            didDamageCoffin = true
-            return true
-        }
-        return false
     }
 
     private func damage(at i: Int, amount: Double) {
