@@ -91,6 +91,7 @@ final class Stage1Scene: SKScene {
     private var chipTexture: SKTexture?             // 파편용 칩 텍스처(1회 생성 후 재사용)
     private var drillEmitter: SKEmitterNode?        // 드릴 연속 파편(있는 동안 birthRate만 토글)
     private var drillShakeID: Int?                  // 지금 드릴 진동 중인 조각
+    private var debrisLayer: SKNode?                // 파편 전용 레이어(돌보다 항상 위, z 100)
 
     // 디버그 시각화 상태
     private var hitboxLayer: SKNode?
@@ -111,6 +112,10 @@ final class Stage1Scene: SKScene {
     override func didMove(to view: SKView) {
         guard pieces.isEmpty else { return }   // 재진입 시 중복 생성 방지
         chipTexture = makeChipTexture(in: view)
+        let layer = SKNode()                   // 파편 전용 레이어(돌 위)
+        layer.zPosition = 100
+        addChild(layer)
+        debrisLayer = layer
         buildCoffin()                          // 먼저 관(뒤)
         buildPieces()                          // 그 위에 돌
     }
@@ -149,8 +154,7 @@ final class Stage1Scene: SKScene {
         e.particleAlphaSpeed = -1.4             // 점점 사라짐
         e.particleRotationRange = .pi * 2
         e.particleRotationSpeed = 6
-        e.zPosition = 50
-        e.targetNode = self                     // 파편이 이미터를 안 따라오고 제자리에 흩어지게
+        e.targetNode = debrisLayer              // 파편이 돌 위 레이어에 제자리로 흩어지게
         return e
     }
 
@@ -160,7 +164,7 @@ final class Stage1Scene: SKScene {
         e.position = p
         e.numParticlesToEmit = 12
         e.particleBirthRate = 600
-        addChild(e)
+        (debrisLayer ?? self).addChild(e)
         // 다 뿜고 수명 지나면 정리
         e.run(.sequence([.wait(forDuration: 1.0), .removeFromParent()]))
     }
@@ -170,7 +174,7 @@ final class Stage1Scene: SKScene {
         if drillEmitter == nil {
             let e = makeDebrisEmitter(color: color)
             e.numParticlesToEmit = 0            // 무한(연속)
-            addChild(e)
+            (debrisLayer ?? self).addChild(e)
             drillEmitter = e
         }
         drillEmitter?.position = p
@@ -339,14 +343,17 @@ final class Stage1Scene: SKScene {
     // MARK: - 알파 기반 판정
 
     /// 그 지점이 노드의 '실제 그림' 위인지(투명 모서리는 false). 마스크 없으면 사각형 전체 solid.
-    private func isOpaque(_ node: SKSpriteNode, _ mask: AlphaMask?, at p: CGPoint) -> Bool {
-        guard node.frame.contains(p) else { return false }   // 빠른 1차 거르기
-        guard let mask = mask else { return true }            // 플레이스홀더(에셋 없음)
-        let lp = node.convert(p, from: self)                  // 노드 로컬(중심 기준)
+    /// 판정은 흔들림(shake) 전의 '원래 중심(center)' 기준 → 진동 중에도 선택이 안 흔들린다.
+    private func isOpaque(_ node: SKSpriteNode, _ mask: AlphaMask?, center: CGPoint, at p: CGPoint) -> Bool {
+        let s = node.xScale == 0 ? 1 : node.xScale
         let w = node.size.width, h = node.size.height
         guard w > 0, h > 0 else { return false }
-        let px = Int((lp.x + w / 2) / w * CGFloat(mask.width))
-        let py = Int((1 - (lp.y + h / 2) / h) * CGFloat(mask.height))  // 이미지 y는 위가 0
+        let lx = (p.x - center.x) / s        // 회전 없음 가정(이 게임은 회전 X)
+        let ly = (p.y - center.y) / s
+        guard abs(lx) <= w / 2, abs(ly) <= h / 2 else { return false }   // 빠른 거르기
+        guard let mask = mask else { return true }                       // 플레이스홀더
+        let px = Int((lx + w / 2) / w * CGFloat(mask.width))
+        let py = Int((1 - (ly + h / 2) / h) * CGFloat(mask.height))      // 이미지 y는 위가 0
         guard let a = mask.alpha(px, py) else { return false }
         return a >= alphaThreshold
     }
@@ -356,7 +363,8 @@ final class Stage1Scene: SKScene {
         guard let m = manager else { return nil }
         var best: Int?
         for i in pieces.indices where !m.pieces[i].isCleared {
-            guard isOpaque(pieces[i], rockMasks[i], at: p) else { continue }
+            let center = basePositions[i] ?? pieces[i].position       // 흔들림 무시한 원래 위치
+            guard isOpaque(pieces[i], rockMasks[i], center: center, at: p) else { continue }
             if best == nil || pieces[i].zPosition > pieces[best!].zPosition { best = i }
         }
         return best
@@ -365,7 +373,7 @@ final class Stage1Scene: SKScene {
     /// 그 지점에 '노출된 관'이 있는지(관 그림 픽셀 위 + 위를 덮은 산 돌이 없음).
     private func coffinExposed(at p: CGPoint) -> Bool {
         guard let node = coffinNode else { return false }
-        return isOpaque(node, coffinMask, at: p)
+        return isOpaque(node, coffinMask, center: node.position, at: p)
     }
 
     // MARK: - 입력
