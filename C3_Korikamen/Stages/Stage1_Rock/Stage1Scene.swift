@@ -378,19 +378,10 @@ final class Stage1Scene: SKScene {
         return isOpaque(node, coffinMask, center: node.position, at: p)
     }
 
-    /// 시작 시 '돌(아무 조각이나)'이 그 지점을 덮고 있었는가. (깬 조각도 포함 → 원래 덮였던 자리 판별)
-    private func wasCoveredByRock(at p: CGPoint) -> Bool {
-        for i in pieces.indices {
-            let center = basePositions[i] ?? pieces[i].position
-            if isOpaque(pieces[i], rockMasks[i], center: center, at: p) { return true }
-        }
-        return false
-    }
-
-    /// 실패 지대: 관 픽셀이 있고 + 원래 돌이 덮었던 자리이고 + 지금은 산 돌이 없음(=깨서 노출됨).
-    /// 처음부터 있던 조각 사이 '틈'은 돌이 덮은 적 없으니 안전.
+    /// 실패 지대: 관 픽셀이 있고 + 지금 산 돌이 안 덮은 곳(=노출된 관 전체).
+    /// 깨고 나면 관 전체가 위험해진다. 시작부터 조각 틈으로 보이는 관도 위험.
     private func coffinDanger(at p: CGPoint) -> Bool {
-        coffinPixel(at: p) && wasCoveredByRock(at: p) && topLiveRockIndex(at: p) == nil
+        coffinPixel(at: p) && topLiveRockIndex(at: p) == nil
     }
 
     // MARK: - 디버그 터치맵
