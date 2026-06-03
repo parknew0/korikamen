@@ -62,6 +62,8 @@ final class Stage1Scene: SKScene {
     }
     /// 디버그: 히트박스/터치점/선택조각을 화면에 그린다.
     var showHitboxes = false
+    /// 디버그: 실제 판정 결과를 색으로 칠한 '터치맵'(초록=돌 깎임, 빨강=관 닿아 실패).
+    var showTouchMap = false { didSet { showTouchMap ? buildTouchMap() : removeTouchMap() } }
 
     // 실시간 조절용(조정모드 슬라이더가 씀). 바뀌면 즉시 재배치.
     var pilePosition = Stage1Scene.pilePosition   { didSet { layoutPile() } }
@@ -374,6 +376,54 @@ final class Stage1Scene: SKScene {
     private func coffinExposed(at p: CGPoint) -> Bool {
         guard let node = coffinNode else { return false }
         return isOpaque(node, coffinMask, center: node.position, at: p)
+    }
+
+    // MARK: - 디버그 터치맵
+
+    private var touchMapNode: SKSpriteNode?
+    private func removeTouchMap() { touchMapNode?.removeFromParent(); touchMapNode = nil }
+
+    /// 화면 전체를 실제 판정 함수로 샘플링해 색칠한 오버레이를 만든다.
+    /// 초록=topLiveRockIndex 있음(돌 깎임), 빨강=coffinExposed(관 닿아 실패). 토글 시 1회 생성.
+    private func buildTouchMap() {
+        removeTouchMap()
+        let W = 256, H = 192                       // 저해상 샘플(디버그용, 1회만)
+        var buf = [UInt8](repeating: 0, count: W * H * 4)
+        for j in 0..<H {
+            let sy = size.height - (CGFloat(j) + 0.5) / CGFloat(H) * size.height
+            for i in 0..<W {
+                let sx = (CGFloat(i) + 0.5) / CGFloat(W) * size.width
+                let p = CGPoint(x: sx, y: sy)
+                let idx = (j * W + i) * 4
+                if topLiveRockIndex(at: p) != nil {            // 초록(안전)
+                    setPixel(&buf, idx, r: 40, g: 220, b: 90, a: 120)
+                } else if coffinExposed(at: p) {              // 빨강(실패)
+                    setPixel(&buf, idx, r: 235, g: 45, b: 45, a: 140)
+                }
+            }
+        }
+        guard let ctx = CGContext(data: &buf, width: W, height: H,
+                                  bitsPerComponent: 8, bytesPerRow: W * 4,
+                                  space: CGColorSpaceCreateDeviceRGB(),
+                                  bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue),
+              let cg = ctx.makeImage() else { return }
+        let tex = SKTexture(cgImage: cg)
+        tex.filteringMode = .nearest
+        let node = SKSpriteNode(texture: tex)
+        node.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+        node.position = CGPoint(x: size.width / 2, y: size.height / 2)
+        node.size = size
+        node.zPosition = 200
+        addChild(node)
+        touchMapNode = node
+    }
+
+    /// premultipliedLast 버퍼에 색 기록(RGB는 알파 곱).
+    private func setPixel(_ buf: inout [UInt8], _ idx: Int, r: Int, g: Int, b: Int, a: Int) {
+        buf[idx]     = UInt8(r * a / 255)
+        buf[idx + 1] = UInt8(g * a / 255)
+        buf[idx + 2] = UInt8(b * a / 255)
+        buf[idx + 3] = UInt8(a)
     }
 
     // MARK: - 입력

@@ -18,6 +18,7 @@ struct Stage1View: View {
     @State private var scene = Stage1Scene(size: Stage1Scene.designSize)
     @State private var editMode = false
     @State private var showHitboxes = false
+    @State private var showTouchMap = false
 
     // 조정모드(돌무더기/관 위치·크기 실시간 조절)
     @State private var adjustMode = false
@@ -59,6 +60,7 @@ struct Stage1View: View {
         }
         .onChange(of: editMode) { _, on in scene.editMode = on }
         .onChange(of: showHitboxes) { _, on in scene.showHitboxes = on }
+        .onChange(of: showTouchMap) { _, on in scene.showTouchMap = on }
         .onChange(of: timer.isTimeOver) { _, over in if over { onFail() } }
         .onChange(of: manager.didClear) { _, cleared in if cleared { timer.stop(); onClear() } }
         .onChange(of: manager.didDamageCoffin) { _, hit in
@@ -90,6 +92,7 @@ struct Stage1View: View {
                 Toggle("조정모드", isOn: $adjustMode).fixedSize()
                 Toggle("배치모드", isOn: $editMode).fixedSize()
                 Toggle("히트박스", isOn: $showHitboxes).fixedSize()
+                Toggle("터치맵", isOn: $showTouchMap).fixedSize()
                 Spacer()
                 Button("클리어 →", action: onClear)
                 Button("실패", role: .destructive, action: onFail)
