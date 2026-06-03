@@ -20,9 +20,25 @@ final class Stage1Scene: SKScene {
     static let designSize = CGSize(width: 1024, height: 768)
     static let pieceCount = 12
 
-    /// 좌표 확정 전에는 nil(격자로 흩뿌림 = 배치 모드).
-    /// dumpPositions()로 찍은 배열을 여기에 붙여넣으면 그 위치로 고정된다.
-    static let bakedLayout: [CGPoint]? = nil
+    /// 무더기 "안에서" 조각끼리의 상대 위치(배치 모드에서 dumpPositions로 뽑은 값).
+    static let bakedLayout: [CGPoint]? = [
+        CGPoint(x: 481.6, y: 673.9), // rock_00
+        CGPoint(x: 481.7, y: 589.1), // rock_01
+        CGPoint(x: 403.2, y: 606.0), // rock_02
+        CGPoint(x: 581.3, y: 600.4), // rock_03
+        CGPoint(x: 564.4, y: 431.3), // rock_04
+        CGPoint(x: 401.2, y: 409.8), // rock_05
+        CGPoint(x: 623.3, y: 330.6), // rock_06
+        CGPoint(x: 562.6, y: 235.6), // rock_07
+        CGPoint(x: 443.2, y: 240.2), // rock_08
+        CGPoint(x: 507.9, y: 111.9), // rock_09
+        CGPoint(x: 484.7, y: 48.2),  // rock_10
+        CGPoint(x: 497.0, y: -40.7), // rock_11
+    ]
+
+    /// 무더기 "전체"를 통째로 옮기는 손잡이. 이 값 하나만 바꾸면 12조각이 같이 이동.
+    /// (기본값은 무더기를 화면 세로 중앙쯤으로 끌어올린 것 — 보면서 마음대로 조절하세요.)
+    static let clusterOffset = CGVector(dx: 0, dy: 67)
 
     private var pieces: [SKSpriteNode] = []
 
@@ -72,7 +88,11 @@ final class Stage1Scene: SKScene {
     }
 
     private func startPosition(_ id: Int) -> CGPoint {
-        if let layout = Self.bakedLayout, id < layout.count { return layout[id] }
+        if let layout = Self.bakedLayout, id < layout.count {
+            // 상대 위치 + 무더기 전체 이동(clusterOffset)
+            return CGPoint(x: layout[id].x + Self.clusterOffset.dx,
+                           y: layout[id].y + Self.clusterOffset.dy)
+        }
         // 배치 모드: 4열 격자로 흩뿌려 전부 잡히게
         let cols = 4
         let rows = (Self.pieceCount + cols - 1) / cols
