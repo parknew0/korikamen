@@ -68,6 +68,12 @@ final class Stage1Scene: SKScene {
     private var coffinNode: SKSpriteNode?
     private var coffinMask: AlphaMask?
 
+    // 균열(절차적) 상태
+    private var crackDark: [Int: SKShapeNode] = [:]     // 어두운 균열선
+    private var crackGlow: [Int: SKShapeNode] = [:]     // 밝은 하이라이트(어떤 돌색에도 보이게)
+    private var crackPatterns: [Int: [Crack]] = [:]
+    private var crackBucket: [Int: Int] = [:]           // 손상 단계 캐시(매 프레임 재생성 방지)
+
     private var clearedShown = Set<Int>()
     private var activeTouch: CGPoint?               // 현재 누르고 있는 지점(플레이 모드)
     private var lastUpdate: TimeInterval = 0
@@ -125,15 +131,20 @@ final class Stage1Scene: SKScene {
         for id in 0..<Self.pieceCount {
             let name = String(format: "rock_%02d", id)
             let node: SKSpriteNode
+            let maskSprite: SKSpriteNode    // 균열 클리핑용(돌 모양)
             if let img = UIImage(named: name) {
-                node = SKSpriteNode(texture: SKTexture(image: img))
+                let tex = SKTexture(image: img)
+                node = SKSpriteNode(texture: tex)
                 rockMasks[id] = AlphaMask(img)
+                maskSprite = SKSpriteNode(texture: tex)
             } else {
-                node = SKSpriteNode(color: Self.placeholderColor(id), size: CGSize(width: 110, height: 110))
+                let size = CGSize(width: 110, height: 110)
+                node = SKSpriteNode(color: Self.placeholderColor(id), size: size)
                 let label = SKLabelNode(text: "\(id)")
                 label.verticalAlignmentMode = .center
                 label.fontSize = 36
                 node.addChild(label)
+                maskSprite = SKSpriteNode(color: .white, size: size)
             }
             node.name = name
             node.anchorPoint = CGPoint(x: 0.5, y: 0.5)
@@ -141,7 +152,53 @@ final class Stage1Scene: SKScene {
             node.position = startPosition(id)
             addChild(node)
             pieces.append(node)
+            attachCracks(to: node, id: id, mask: maskSprite)
         }
+    }
+
+    /// 돌 모양에 클리핑되는 균열 오버레이(밝은 선 + 어두운 선)를 조각 위에 얹는다.
+    private func attachCracks(to node: SKSpriteNode, id: Int, mask: SKSpriteNode) {
+        mask.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+        mask.position = .zero
+        let crop = SKCropNode()
+        crop.maskNode = mask              // 돌 그림이 있는 픽셀에서만 균열이 보임
+        crop.zPosition = 1                // 돌 텍스처 위
+
+        let glow = SKShapeNode()          // 밝은 하이라이트(아래)
+        glow.strokeColor = SKColor(white: 1, alpha: 0.35)
+        glow.lineWidth = 4
+        glow.lineCap = .round
+        glow.lineJoin = .round
+
+        let dark = SKShapeNode()          // 어두운 균열(위)
+        dark.strokeColor = SKColor(white: 0, alpha: 0.85)
+        dark.lineWidth = 2
+        dark.lineCap = .round
+        dark.lineJoin = .round
+
+        crop.addChild(glow)
+        crop.addChild(dark)
+        node.addChild(crop)
+
+        crackGlow[id] = glow
+        crackDark[id] = dark
+        crackPatterns[id] = CrackPattern.generate(seed: UInt64(id + 1),
+                                                   width: node.size.width,
+                                                   height: node.size.height)
+        crackBucket[id] = -1
+    }
+
+    /// 손상도에 맞춰 균열 경로/굵기 갱신(단계가 바뀔 때만 재생성).
+    private func updateCracks(id: Int, damage: Double) {
+        let bucket = Int(damage * 24)
+        guard crackBucket[id] != bucket else { return }
+        crackBucket[id] = bucket
+        guard let pattern = crackPatterns[id] else { return }
+        let path = CrackPattern.path(pattern, damage: damage)
+        crackDark[id]?.path = path
+        crackGlow[id]?.path = path
+        crackDark[id]?.lineWidth = 1.5 + CGFloat(damage) * 2.0   // 손상 클수록 굵게
+        crackGlow[id]?.lineWidth = 3.5 + CGFloat(damage) * 2.5
     }
 
     private func startPosition(_ id: Int) -> CGPoint {
@@ -317,8 +374,7 @@ final class Stage1Scene: SKScene {
             if piece.isCleared {
                 breakAway(id: piece.id, node: node)
             } else {
-                node.color = .black
-                node.colorBlendFactor = CGFloat((1 - piece.hp) * 0.6)   // 닳을수록 어둡게
+                updateCracks(id: piece.id, damage: 1 - piece.hp)        // 닳을수록 갈라짐
             }
         }
     }
