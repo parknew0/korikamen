@@ -15,19 +15,19 @@ struct Stage1View: View {
     @EnvironmentObject private var pencil: PencilInput
     @StateObject private var manager = Stage1GameManager()
     @StateObject private var timer = CountdownTimer(duration: 60)   // 60초 임시값(TBD)
-    @State private var scene = Stage1Scene(size: Stage1Scene.designSize)
+    @State private var scene = Stage1Scene(size: Stage1Layout.designSize)
     @State private var editMode = false
     @State private var showHitboxes = false
     @State private var showTouchMap = false
 
     // 조정모드(돌무더기/관 위치·크기 실시간 조절)
     @State private var adjustMode = false
-    @State private var pileX = Double(Stage1Scene.pilePosition.x)
-    @State private var pileY = Double(Stage1Scene.pilePosition.y)
-    @State private var pileScale = Double(Stage1Scene.pileScale)
-    @State private var coffinX = Double(Stage1Scene.coffinPosition.x)
-    @State private var coffinY = Double(Stage1Scene.coffinPosition.y)
-    @State private var coffinScale = Double(Stage1Scene.coffinScale)
+    @State private var pileX = Double(Stage1Layout.pilePosition.x)
+    @State private var pileY = Double(Stage1Layout.pilePosition.y)
+    @State private var pileScale = Double(Stage1Layout.pileScale)
+    @State private var coffinX = Double(Stage1Layout.coffinPosition.x)
+    @State private var coffinY = Double(Stage1Layout.coffinPosition.y)
+    @State private var coffinScale = Double(Stage1Layout.coffinScale)
 
     var body: some View {
         ZStack {
