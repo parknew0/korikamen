@@ -35,12 +35,13 @@ enum Stage1Layout {
     /// 무더기 "전체"의 화면상 중심 위치(조정모드로 맞춘 값을 여기 박는다).
     static let pilePosition = CGPoint(x: 502.7, y: 420.0)
     /// 무더기 "전체" 크기 배율(1.0 = 원본). 그룹 통째 스케일이라 조각 간 상대 간격은 유지된다.
-    static let pileScale: CGFloat = 1.0
+    /// (조정모드로 맞춘 값. 저장값이 없을 때의 기본 = Stage1Transform.fallback)
+    static let pileScale: CGFloat = 0.737
 
     /// 관의 화면상 중심 위치.
     static let coffinPosition = CGPoint(x: 502.7, y: 420.0)
     /// 관 크기 배율(1.0 = 원본).
-    static let coffinScale: CGFloat = 1.0
+    static let coffinScale: CGFloat = 0.755
 
     /// bakedLayout의 평균(무더기 원래 중심). 그룹 스케일/이동의 기준점.
     static var centroid: CGPoint {

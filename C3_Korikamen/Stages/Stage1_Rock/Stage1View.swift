@@ -20,14 +20,14 @@ struct Stage1View: View {
     @State private var showHitboxes = false
     @State private var showTouchMap = false
 
-    // 조정모드(돌무더기/관 위치·크기 실시간 조절)
+    // 조정모드(돌무더기/관 위치·크기 실시간 조절) — 저장된 값으로 시작(없으면 기본값)
     @State private var adjustMode = false
-    @State private var pileX = Double(Stage1Layout.pilePosition.x)
-    @State private var pileY = Double(Stage1Layout.pilePosition.y)
-    @State private var pileScale = Double(Stage1Layout.pileScale)
-    @State private var coffinX = Double(Stage1Layout.coffinPosition.x)
-    @State private var coffinY = Double(Stage1Layout.coffinPosition.y)
-    @State private var coffinScale = Double(Stage1Layout.coffinScale)
+    @State private var pileX = Double(Stage1Transform.load().pilePosition.x)
+    @State private var pileY = Double(Stage1Transform.load().pilePosition.y)
+    @State private var pileScale = Double(Stage1Transform.load().pileScale)
+    @State private var coffinX = Double(Stage1Transform.load().coffinPosition.x)
+    @State private var coffinY = Double(Stage1Transform.load().coffinPosition.y)
+    @State private var coffinScale = Double(Stage1Transform.load().coffinScale)
 
     var body: some View {
         ZStack {
@@ -56,6 +56,7 @@ struct Stage1View: View {
         .onAppear {
             scene.manager = manager
             scene.pressureProvider = { let p = pencil.state.pressure; return p > 0 ? p : 0.5 }
+            applyTransform()   // 저장된(또는 기본) 위치·배율을 씬에 반영 — 릴리스 포함 항상
             timer.start()
         }
         .onChange(of: editMode) { _, on in scene.editMode = on }
@@ -115,9 +116,20 @@ struct Stage1View: View {
                 adjustRow("관 X", $coffinX, 0...1024)
                 adjustRow("관 Y", $coffinY, -150...900)
                 adjustRow("관 크기", $coffinScale, 0.2...2.0)
-                Button("값 출력 → 콘솔") { scene.dumpTransform() }
-                    .buttonStyle(.borderedProminent)
-                    .frame(maxWidth: .infinity)
+                HStack {
+                    Button("값 출력 → 콘솔") { scene.dumpTransform() }
+                        .buttonStyle(.borderedProminent)
+                    Button("기본값 복원", role: .destructive) {
+                        Stage1Transform.reset()
+                        let d = Stage1Transform.fallback
+                        pileX = Double(d.pilePosition.x); pileY = Double(d.pilePosition.y)
+                        pileScale = Double(d.pileScale)
+                        coffinX = Double(d.coffinPosition.x); coffinY = Double(d.coffinPosition.y)
+                        coffinScale = Double(d.coffinScale)
+                        applyTransform()
+                    }
+                }
+                .frame(maxWidth: .infinity)
             }
             .padding(12)
             .frame(width: 320)
@@ -138,12 +150,18 @@ struct Stage1View: View {
         }
     }
 
-    /// 슬라이더 값을 씬에 즉시 반영.
+    #endif
+
+    /// 현재 값을 씬에 즉시 반영하고 UserDefaults에 저장(재시작 후에도 유지).
+    /// 적용은 릴리스 포함 항상, 저장은 조정모드에서 값이 바뀔 때 호출된다.
     private func applyTransform() {
         scene.pilePosition = CGPoint(x: pileX, y: pileY)
         scene.pileScale = CGFloat(pileScale)
         scene.coffinPosition = CGPoint(x: coffinX, y: coffinY)
         scene.coffinScale = CGFloat(coffinScale)
+        Stage1Transform(pilePosition: CGPoint(x: pileX, y: pileY),
+                        pileScale: CGFloat(pileScale),
+                        coffinPosition: CGPoint(x: coffinX, y: coffinY),
+                        coffinScale: CGFloat(coffinScale)).save()
     }
-    #endif
 }

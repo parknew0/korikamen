@@ -18,37 +18,11 @@
 import SpriteKit
 
 final class Stage1Scene: SKScene {
-    /// 설계 기준 캔버스(고정). aspectFit이라 기기 해상도가 달라도 좌표가 그대로 재사용됨.
-    static let designSize = CGSize(width: 1024, height: 768)
-    static let pieceCount = 12
-
-    /// 무더기 "안에서" 조각끼리의 상대 위치(배치 모드에서 dumpPositions로 뽑은 값).
-    static let bakedLayout: [CGPoint]? = [
-        CGPoint(x: 481.6, y: 673.9), // rock_00
-        CGPoint(x: 481.7, y: 589.1), // rock_01
-        CGPoint(x: 403.2, y: 606.0), // rock_02
-        CGPoint(x: 581.3, y: 600.4), // rock_03
-        CGPoint(x: 564.4, y: 431.3), // rock_04
-        CGPoint(x: 401.2, y: 409.8), // rock_05
-        CGPoint(x: 623.3, y: 330.6), // rock_06
-        CGPoint(x: 562.6, y: 235.6), // rock_07
-        CGPoint(x: 443.2, y: 240.2), // rock_08
-        CGPoint(x: 507.9, y: 111.9), // rock_09
-        CGPoint(x: 484.7, y: 48.2),  // rock_10
-        CGPoint(x: 497.0, y: -40.7), // rock_11
-    ]
-
-    /// 무더기 "전체"의 화면상 중심 위치(조정모드로 맞춘 값을 여기 박는다).
-    static let pilePosition = CGPoint(x: 502.7, y: 420.0)
-    /// 무더기 "전체" 크기 배율(1.0 = 원본). 그룹 통째 스케일이라 조각 간 상대 간격은 유지된다.
-    static let pileScale: CGFloat = 0.737
+    // 배치/좌표·배율 상수는 모두 Stage1Layout이 단일 소스로 보유한다(여기 중복 금지).
 
     /// 돌무더기 "뒤"에 깔리는 관 이미지. Assets에 이 이름의 png를 넣으면 자동으로 깔린다.
     static let coffinName = "coffin"
-    /// 관의 화면상 중심 위치.
-    static let coffinPosition = CGPoint(x: 502.7, y: 420.0)
-    /// 관 크기 배율(1.0 = 원본).
-    static let coffinScale: CGFloat = 0.755
+
     /// 알파 판정 문턱(0~255). 이 값 이상이면 '실제 그림이 있는' 픽셀로 본다(돌용).
     private let alphaThreshold: UInt8 = 10
     /// 관 전용(더 높음) — 관 위험영역을 안쪽으로 줄여 가장자리에 안전 여유를 준다. 키울수록 더 관대.
