@@ -33,15 +33,15 @@ enum Stage1Layout {
     ]
 
     /// 무더기 "전체"의 화면상 중심 위치(조정모드로 맞춘 값을 여기 박는다).
-    static let pilePosition = CGPoint(x: 502.7, y: 420.0)
+    static let pilePosition = CGPoint(x: 502.7, y: 376.8)
     /// 무더기 "전체" 크기 배율(1.0 = 원본). 그룹 통째 스케일이라 조각 간 상대 간격은 유지된다.
     /// (조정모드로 맞춘 값. 저장값이 없을 때의 기본 = Stage1Transform.fallback)
-    static let pileScale: CGFloat = 0.737
+    static let pileScale: CGFloat = 0.536
 
     /// 관의 화면상 중심 위치.
-    static let coffinPosition = CGPoint(x: 502.7, y: 420.0)
+    static let coffinPosition = CGPoint(x: 515.7, y: 370.2)
     /// 관 크기 배율(1.0 = 원본).
-    static let coffinScale: CGFloat = 0.755
+    static let coffinScale: CGFloat = 0.607
 
     /// 돌 터치 여유(화면 포인트). 돌 실루엣을 이만큼 바깥으로 넓혀 판정한다.
     /// 0 = 실루엣과 정확히 일치(기본). 누르기 빡빡하면 몇 포인트 올리면 가장자리가 관대해진다.

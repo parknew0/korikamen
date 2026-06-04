@@ -89,7 +89,8 @@ final class Stage1Scene: SKScene {
     override init(size: CGSize) {
         super.init(size: size)
         scaleMode = .aspectFit
-        backgroundColor = SKColor(white: 0.12, alpha: 1)
+        // backgroundColor = SKColor(white: 0.12, alpha: 1)
+        backgroundColor = SKColor.clear // 노튼: 배경 지움 
     }
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
