@@ -31,7 +31,13 @@ struct Stage1View: View {
 
     var body: some View {
         ZStack {
-            SpriteView(scene: scene)
+            Image("Stage1Background") //배경 추가
+                .resizable()
+                .scaledToFill() //화면 꽉 채우기
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .ignoresSafeArea()
+            
+            SpriteView(scene: scene, options: [.allowsTransparency]) // spritekit 배경 투명하게 설정
                 .ignoresSafeArea()
 
             // 상단 HUD: 남은 시간 + 도구 전환
@@ -99,7 +105,7 @@ struct Stage1View: View {
                 Button("실패", role: .destructive, action: onFail)
             }
             .padding(8)
-            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 10))
+            //.background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 10))
         }
         .padding()
     }
@@ -133,7 +139,7 @@ struct Stage1View: View {
             }
             .padding(12)
             .frame(width: 320)
-            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14))
+            // .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14))
             Spacer()
         }
         .padding()
