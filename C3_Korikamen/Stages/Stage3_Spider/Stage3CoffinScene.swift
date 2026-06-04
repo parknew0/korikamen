@@ -22,11 +22,14 @@ final class Stage3CoffinScene: SKScene { // 관 그리기 위해 SKScene 표준 
         
         // 몸체 (중앙 + 뒤 레이어로)
         body.position = .zero
+        body.position = CGPoint(x:30,y:5)
         body.zPosition = 0
+        body.size = CGSize(width: 300, height: 1000)
         addChild(body)
         
         // 뚜껑 (몸체와 같은 위치 + 앞 레이어로)
         lid.position = .zero
+        body.position = CGPoint(x:0,y:5)
         lid.zPosition = 1
         lidClosedX = lid.position.x // 뚜껑 닫히는 기준인 x(위치) 저장
         openDistance = lid.size.width * 0.5 // 뚜껑 폭만큼 비켜나도록
