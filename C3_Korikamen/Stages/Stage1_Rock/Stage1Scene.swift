@@ -106,6 +106,7 @@ final class Stage1Scene: SKScene {
             pieceNodes: pieces, rockMasks: rockMasks,
             coffinNode: coffinNode, coffinMask: coffinMask, centers: centers,
             alphaThreshold: alphaThreshold, coffinAlphaThreshold: coffinAlphaThreshold,
+            rockTouchTolerance: Stage1Layout.rockTouchTolerance,
             isCleared: { [weak self] i in self?.manager?.pieces[i].isCleared ?? true })
     }
 

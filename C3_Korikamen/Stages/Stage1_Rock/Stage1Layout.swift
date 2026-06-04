@@ -43,6 +43,11 @@ enum Stage1Layout {
     /// 관 크기 배율(1.0 = 원본).
     static let coffinScale: CGFloat = 0.755
 
+    /// 돌 터치 여유(화면 포인트). 돌 실루엣을 이만큼 바깥으로 넓혀 판정 →
+    /// 축소로 생긴 조각 사이 틈/반투명 가장자리에서도 가까운 돌이 잡힌다.
+    /// 화면 포인트 고정이라 무더기를 줄일수록 상대적으로 더 관대해진다. 0이면 실루엣 그대로.
+    static let rockTouchTolerance: CGFloat = 16
+
     /// bakedLayout의 평균(무더기 원래 중심). 그룹 스케일/이동의 기준점.
     static var centroid: CGPoint {
         guard let layout = bakedLayout, !layout.isEmpty else {
