@@ -108,11 +108,13 @@ struct Stage3View: View {
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 160, height: 560) // 관 크기 맞춤
+                                .offset(x:0,y:-15)
                             
                             Image(webImageName(for: manager.webLayerIndex + 1))
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 160, height: 560) // 관 크기 맞춤
+                                .offset(x:0,y:-15)
                                 .blur(radius: 2 * wipeProgress) //걷히며 흐려지도록
                                 .mask(
                                     LinearGradient(
