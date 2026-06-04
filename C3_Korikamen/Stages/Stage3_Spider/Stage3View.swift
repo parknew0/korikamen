@@ -39,7 +39,8 @@ struct Stage3View: View {
                     .fill(Color.green.opacity(0.8))
                     .frame(height: h * (manager.targetMax - manager.targetMin))
                     .offset(y: -h * manager.targetMin)
-                
+                    .animation(.easeInOut(duration: 0.5), value: manager.targetMin)// 범위 변경 시 애니메이션 효과 추가 
+                    .animation(.easeInOut(duration: 0.5), value: manager.targetMax) // 범위 변경 시 애니메이션 효과 추가
                 RoundedRectangle(cornerRadius: 8)// 현재 게이지(노란색으로)
                     .fill(Color.yellow) //게이지 올라갈 때 하늘색으로
                     .frame(height: h * manager.gauge) //게이지 비율만큼 표현

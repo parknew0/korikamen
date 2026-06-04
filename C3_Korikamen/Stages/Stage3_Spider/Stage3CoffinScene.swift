@@ -40,6 +40,4 @@ final class Stage3CoffinScene: SKScene { // 관 그리기 위해 SKScene 표준 
     func moveLid(progress: Double) { // progress(0~1)
         lid.position.x = lidClosedX + CGFloat(progress) * openDistance // 시작시, 이동 거리를 현재 기준 + 진행도 * 거리로 설정
     }
-    
-    
 }

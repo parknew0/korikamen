@@ -10,22 +10,9 @@
 		034EF1982FCC7CE400D37F86 /* C3_Korikamen.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = C3_Korikamen.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		0322DCDD2FD1B6F40050126E /* Exceptions for "C3_Korikamen" folder in "C3_Korikamen" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				"C3-Korikamen-Info.plist",
-			);
-			target = 034EF1972FCC7CE400D37F86 /* C3_Korikamen */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		034EF19A2FCC7CE400D37F86 /* C3_Korikamen */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				0322DCDD2FD1B6F40050126E /* Exceptions for "C3_Korikamen" folder in "C3_Korikamen" target */,
-			);
 			path = C3_Korikamen;
 			sourceTree = "<group>";
 		};
