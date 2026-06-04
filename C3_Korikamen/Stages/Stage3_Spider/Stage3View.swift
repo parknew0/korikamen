@@ -24,7 +24,7 @@ struct Stage3View: View {
     @State private var dragStartX : CGFloat? = nil // 드래그 시작시 x 기준
     @State private var fadeOpacity: Double = 0 //씬1 -> 2로 전환시 나올 검은막 투명도
     @State private var wipeProgress: Double = 0   // webindexlayer 상태 전용, 0=안 걷힘, 1=완전히 걷힘
-
+    
     private let dragRequiredDistance: CGFloat = 200 // 기준 이동거리 (임시입니다!!!!)
     
     //세로 게이지 바 (테스트용)
@@ -51,20 +51,20 @@ struct Stage3View: View {
     //코리카멘 거미줄 버전에 따라 매핑할 수 있도록 함수 추가
     private func webImageName(for index: Int) -> String {
         switch index {
-            case 5: return "CoffinBody"
-            case 4: return "Web4"
-            case 3: return "Web3"
-            case 2: return "Web2"
-            case 1: return "Web1"
+        case 5: return "CoffinBody"
+        case 4: return "Web4"
+        case 3: return "Web3"
+        case 2: return "Web2"
+        case 1: return "Web1"
         default: return "CoffinBody"
+        }
     }
-}
     
     var body: some View {
         ZStack{
             Image("Stage3Background")
                 .resizable()
-                .scaledToFill() //화면 꽉 채우기
+                .scaledToFill() //화면 맞추기
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .ignoresSafeArea()
             
@@ -81,7 +81,7 @@ struct Stage3View: View {
                     }
                 }
                 .overlay(alignment:.bottomTrailing) { // 마찬가지로 우측 하단에 고정
-                    if manager.scene == .removingWeb { // 테스트용으로 거미줄 제거 단계에서만 보이도록 설정 
+                    if manager.scene == .removingWeb { // 테스트용으로 거미줄 제거 단계에서만 보이도록 설정
                         HStack{
                             Button("클리어 → 다음", action: onClear).buttonStyle(.borderedProminent)
                             Button("실패(테스트)", role: .destructive, action: onFail)
@@ -93,64 +93,78 @@ struct Stage3View: View {
             
             
             VStack(spacing: 20) {
-                Text("스테이지 3 · 관 열기 & 거미줄 제거").font(.largeTitle).bold()
-                    .foregroundColor(.white)
-                // Text("노튼 담당 — 여기에 게임 구현").foregroundStyle(.secondary)
-                Text("남은 시간: \(Int(timer.remaining))초").monospacedDigit()
-                    .foregroundStyle(Color.red.opacity(0.8))
-                    .monospacedDigit() //숫자만 일정한 고정폭을 갖도록 조정
-                
-                Spacer()
-                
-                //scene 전한 구조로 정리
-                switch manager.scene {
-                case .openingLid:
-                    // Scene1 — 관 (드래그로 뚜껑 열기)
-                    SpriteView(scene: coffinScene, options: [.allowsTransparency])
-                        .frame(width:300, height: 600)
-                    Text("뚜껑을 옆으로 밀어보세요 (\(Int(manager.lidProgress * 100))%)")
-                        .foregroundStyle(Color.white.opacity(0.8))
-                    
-                case .removingWeb:
-                    // Scene2 — 거미줄 게이지 (기존)
-                    ZStack {
-                        Image(webImageName(for: manager.webLayerIndex)) //단계에 맞는 거미줄 이미지 표시, webLayerIndex가 바뀌면 자동으로 이미지 교체.
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 160, height: 560) // 관 크기 맞춤
-                        
-                        Image(webImageName(for: manager.webLayerIndex + 1))
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 160, height: 560) // 관 크기 맞춤
-                            .blur(radius: 2 * wipeProgress) //걷히며 흐려지도록 
-                            .mask(
-                                LinearGradient(
-                                    stops: [
-                                        .init(color:.clear, location: 0),
-                                        .init(color: .clear, location: max(0, wipeProgress - 0.15)),
-                                        .init(color: .black, location: min(1, wipeProgress + 0.15)),
-                                        .init(color: .black, location: 1)
-                                    ],
-                                    startPoint: .top,
-                                    endPoint: .bottom
+                ZStack{
+                    //scene 전한 구조로 정리
+                    switch manager.scene {
+                    case .openingLid:
+                        // Scene1 — 관 (드래그로 뚜껑 열기)
+                        SpriteView(scene: coffinScene, options: [.allowsTransparency])
+                            .frame(width:300, height: 600)
+                      
+                    case .removingWeb:
+                        // Scene2 — 거미줄 게이지 (기존)
+                        ZStack {
+                            Image(webImageName(for: manager.webLayerIndex)) //단계에 맞는 거미줄 이미지 표시, webLayerIndex가 바뀌면 자동으로 이미지 교체.
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 160, height: 560) // 관 크기 맞춤
+                            
+                            Image(webImageName(for: manager.webLayerIndex + 1))
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 160, height: 560) // 관 크기 맞춤
+                                .blur(radius: 2 * wipeProgress) //걷히며 흐려지도록
+                                .mask(
+                                    LinearGradient(
+                                        stops: [
+                                            .init(color:.clear, location: 0),
+                                            .init(color: .clear, location: max(0, wipeProgress - 0.15)),
+                                            .init(color: .black, location: min(1, wipeProgress + 0.15)),
+                                            .init(color: .black, location: 1)
+                                        ],
+                                        startPoint: .top,
+                                        endPoint: .bottom
+                                    )
                                 )
-                            )
+                        }
+                        .offset(x: 0, y: 20)
+                      //  Text("게이지: \(Int(manager.gauge * 100))%")
+                        //    .opacity(1.0)
+                        //Text("성공: \(manager.successCount)/\(manager.requiredSuccessCount)   거미줄: \(manager.webLayerIndex)겹")
+                          //  .opacity(1.0)
+                        
+                        
                     }
-                    .offset(x: 0, y: 20)
-                        Text("게이지: \(Int(manager.gauge * 100))%")
-                            .opacity(1.0)
-                        Text("성공: \(manager.successCount)/\(manager.requiredSuccessCount)   거미줄: \(manager.webLayerIndex)겹")
-                            .opacity(1.0)
-                  
-                    
                 }
+                .overlay(alignment:.center){
+                    if manager.scene == .openingLid { //관을 왼 - 오로 움직이라는 시각적 피드백 추가
+                       
+                            Image(systemName: "arrow.forward")
+                                .font(.system(size: 100)) // 원하는 크기 지정
+                                .foregroundColor(Color.white)
+                                .offset(x: -140, y: 20)
+                                .symbolEffect(.wiggle.byLayer, options: .repeat(.periodic(delay: 0.4)))
+                    }
+                }
+                
             }
             // 씬이 사라질때의 색 지정
             Color.black
                 .ignoresSafeArea()
                 .opacity(fadeOpacity)
                 .allowsHitTesting(false) //조작 방해 x
+        }
+        .overlay(alignment:.top) {
+            VStack(spacing:8) {
+                Text("스테이지 3 · 관 열기 & 거미줄 제거").font(.largeTitle).bold()
+                    .foregroundColor(.white)
+                // Text("노튼 담당 — 여기에 게임 구현").foregroundStyle(.secondary)
+                Text("남은 시간: \(Int(timer.remaining))초").monospacedDigit()
+                    .foregroundStyle(Color.red.opacity(0.8))
+                    .monospacedDigit() //숫자만 일정한 고정폭을 갖도록 조정
+            }
+            .padding(.top,20)
+           
         }
         .padding(.leading, -10)
         .onAppear { timer.start() }
