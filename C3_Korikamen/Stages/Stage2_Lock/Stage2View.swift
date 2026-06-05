@@ -25,8 +25,10 @@ struct Stage2View: View {
                 Button("클리어 → 다음", action: onClear).buttonStyle(.borderedProminent)
                 Button("실패(테스트)", role: .destructive, action: onFail)
             }
-           
-
+            HStack{
+                Button("클리어 → 다음", action: onClear).buttonStyle(.borderedProminent)
+                Button("실패(테스트)", role: .destructive, action: onFail)
+            }
         }
         .padding()
         .onAppear { timer.start() }

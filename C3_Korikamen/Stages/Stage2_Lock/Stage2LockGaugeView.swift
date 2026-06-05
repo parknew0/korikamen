@@ -16,7 +16,7 @@ struct LockGaugeView: View {
     @State private var tiltRangeUpper = 55.0        // 목표 Tilt 범위(Upper)
     @State private var rollRangeLower = 160.0       // 목표 Barrel Roll 범위(Lower)
     @State private var rollRangeUpper = 200.0       // 목표 Barrel Roll 범위(Upper)
-    @State private var hapticFalloff = 12.0         // 햅틱 강도(추후 삭제예정 - 어느 정도가 적당한지 테스트 위함)
+    @State private var hapticFalloff = 30.0         // 햅틱 피드백을 줄 수 있는 범위(캔버스에 맞춰 수치 조정 필요)
     @State private var holdDuration = 0.0           // 유지시간
     @State private var lastHoldTick: Date?          // 바로 직전에 시간을 쟀던 과거의 타이머 시점
     @State private var isClear = false              // 클리어 여부
@@ -34,6 +34,10 @@ struct LockGaugeView: View {
         .onReceive(holdticker) { date in    // holdticker로부터 신호가 오면
             updateHoldProgress(at: date)    // 현재 시각(date)을 받아서 updateHoldProgress 실행(3초 버티는지 검사)
         }
+        
+        // 화면에 펜슬을 접촉시키고 있지 않으면 유지시간 리셋
+        .onChange(of: !pencil.state.isTouching) { _, _ in resetChallenge() }
+        
         // 목표 범위가 바뀌는 경우 유지시간 리셋
         .onChange(of: tiltRangeLower) { _, _ in resetChallenge() }
         .onChange(of: tiltRangeUpper) { _, _ in resetChallenge() }
@@ -42,31 +46,31 @@ struct LockGaugeView: View {
     }
 
     private func landscapeLayout(size: CGSize) -> some View {
-        let canvasWidth = min(size.width * 0.48, 520)
+        _ = min(size.width * 0.48, 520)
+//        let canvasWidth = min(size.width * 0.48, 520)
 
         return HStack(alignment: .top, spacing: 18) {
             gaugePanel      // 목표와 현재 Tilt/Barrel Roll값 확인 가능한 패널
             
-            PencilStateCanvas(state: pencil.state)      // 실제 펜슬을 접촉시키는 캔버스
-                .frame(width: canvasWidth)
+            // 실제 펜슬을 접촉시키는 캔버스
+            Stage2LockCanvasView(
+                state: pencil.state,
+                holdDuration: holdDuration,
+                holdGoal: holdGoal,
+                isClear: isClear
+            )
+            
         }
         .padding(20)
     }
 
     private var gaugePanel: some View {     // 목표와 현재 Tilt/Barrel Roll값 확인 가능한 패널
-        VStack(alignment: .leading, spacing: 14) {
-//            header      // 제목이랑 목표 써있는 용도. 추후 삭제 예정(테스트 시 가독성을 위해 사용)
-
-            ProgressView(value: holdDuration, total: holdGoal)      // 유지시간 게이지(프로그레스바) - 디자인 변경 예정
-                .tint(isClear ? .green : .orange)
-                .scaleEffect(x: 1, y: 2, anchor: .center)
-                .padding(.vertical, 6)
-
-            VStack(spacing: 12) {       // Tilt, Barrel Roll 원형 게이지
+        VStack(alignment: .center, spacing: 20) {
+            VStack(spacing: 15) {       // Tilt, Barrel Roll 원형 게이지
                 PencilRangeGauge(
-                    title: "Tilt",      // 타이틀은 추후 더 쉬운 이름으로 변경 예정(피그마 참고)
+                    title: "기울이기",                       // 어떤 게이지인지 나타내는 이름
                     value: pencil.state.tiltDegrees,        // Tilt 현재 값
-                    isSatisfied: tiltRangeSatisfied,        // 목표 Tilt 범위에 현재 tilt가 들어가있는가
+                    isSatisfied: tiltRangeSatisfied,        // 목표 Tilt 범위에 현재 tilt 값이 들어가있는가
                     targetLower: min(tiltRangeLower, tiltRangeUpper),
                     targetUpper: max(tiltRangeLower, tiltRangeUpper),
                     gaugeRange: 0...90,     // Tilt 범위는 0도~90도
@@ -74,9 +78,9 @@ struct LockGaugeView: View {
                 )
 
                 PencilRangeGauge(
-                    title: "Barrel Roll",       // 타이틀은 추후 더 쉬운 이름으로 변경 예정(피그마 참고)
-                    value: pencil.state.barrelRollDegrees,
-                    isSatisfied: rollRangeSatisfied,
+                    title: "돌리기",       // 어떤 게이지인지 나타내는 이름
+                    value: pencil.state.barrelRollDegrees,      // Barrel Roll 현재 값
+                    isSatisfied: rollRangeSatisfied,            // 목표 Barrel Roll 범위에 현재 Barrel Roll 값이 들어가있는가
                     targetLower: NormalizedDegrees(rollRangeLower),
                     targetUpper: NormalizedDegrees(rollRangeUpper),
                     gaugeRange: 0...360,        // Barrel Roll 범위는 0도~360도
@@ -84,53 +88,10 @@ struct LockGaugeView: View {
                 )
             }
             .frame(maxHeight: .infinity)
-
-//            HStack(alignment: .bottom) {        // 유지 시간(상단 프로그레스바와 동일 기능 - 추후 삭제 예정)
-//                VStack(alignment: .leading, spacing: 4) {
-//                    Text("유지 시간")
-//                        .font(.subheadline)
-//                        .foregroundStyle(.secondary)
-//                    Text("\(holdDuration, format: .number.precision(.fractionLength(1)))/\(holdGoal, format: .number.precision(.fractionLength(0)))s")
-//                        .font(.system(size: 34, weight: .bold, design: .rounded))
-//                        .monospacedDigit()
-//                }
-//
-//                Spacer()
-//            }
-
-//            controls        // 범위 조작하는 패널(테스트 시 사용, 추후 삭제 예정)
         }
-        .padding(16)
-        .background(Color(uiColor: .secondarySystemBackground), in: RoundedRectangle(cornerRadius: 8))
+        .padding(20)
+        .frame(width: 250)      // 패널 감싸는 프레임(가로폭 고정)
     }
-
-//    private var header: some View {     // 제목이랑 목표 써있는 용도. 추후 삭제 예정(테스트 시 가독성을 위해 사용)
-//        VStack(alignment: .leading, spacing: 4) {
-//            Text(isClear ? "Clear" : "Lockpick Hold")
-//                .font(.system(size: 26, weight: .semibold, design: .rounded))
-//                .foregroundStyle(isClear ? .green : .primary)
-//            Text("Tilt와 Barrel Roll을 목표 범위 안에 \(Int(holdGoal))초 유지")
-//                .font(.subheadline)
-//                .foregroundStyle(.secondary)
-//        }
-//    }
-
-//    private var controls: some View {       // 범위 조작하는 패널(테스트 시 사용, 추후 삭제 예정)
-//        VStack(spacing: 8) {
-//            HStack(spacing: 14) {       // Tilt 범위 조절
-//                PencilRangeSlider(title: "Tilt Min", value: $tiltRangeLower, range: 0...90)
-//                PencilRangeSlider(title: "Tilt Max", value: $tiltRangeUpper, range: 0...90)
-//            }
-//
-//            HStack(spacing: 14) {       // Barrel Roll 범위 조절, 햅틱 빈도 조절
-//                PencilRangeSlider(title: "Roll Min", value: $rollRangeLower, range: 0...360)
-//                PencilRangeSlider(title: "Roll Max", value: $rollRangeUpper, range: 0...360)
-//                PencilRangeSlider(title: "Falloff", value: $hapticFalloff, range: 3...30)
-//            }
-//        }
-//        .padding(12)
-//        .background(Color(uiColor: .tertiarySystemBackground), in: RoundedRectangle(cornerRadius: 8))
-//    }
 
     private var tiltRangeSatisfied: Bool {      // PencilRangeGauge에서 범위를 만족했는지 확인하는 용도로 사용(Tilt)
         // tiltRangeLower, tiltRangeUpper 이름에 상관없이 설정된 두 변수 중 작은 값을 범위의 최솟값, 큰 값을 범위의 최댓값으로 설정
@@ -184,86 +145,7 @@ struct LockGaugeView: View {
     }
 }
 
-struct PencilStateCanvas: View {        // 실제 펜슬을 접촉시키는 캔버스
-    let state: PencilState
 
-    var body: some View {       // 캔버스 디자인은 추후 수정 예정(Hi-Fi)
-        GeometryReader { geometry in
-            ZStack {
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(Color(uiColor: .systemGroupedBackground))
-
-                Canvas { context, size in
-                    var path = Path()
-                    let spacing: CGFloat = 48
-                    
-//                    // 격자무늬
-//                    stride(from: CGFloat(0), through: size.width, by: spacing).forEach { x in
-//                        path.move(to: CGPoint(x: x, y: 0))
-//                        path.addLine(to: CGPoint(x: x, y: size.height))
-//                    }
-//
-//                    stride(from: CGFloat(0), through: size.height, by: spacing).forEach { y in
-//                        path.move(to: CGPoint(x: 0, y: y))
-//                        path.addLine(to: CGPoint(x: size.width, y: y))
-//                    }
-//
-//                    context.stroke(path, with: .color(.secondary.opacity(0.22)), lineWidth: 1)
-                }
-
-                if let location = state.location {      // nil 탈출(좌표 없는 경우)
-                    // 캔버스 범위를 벗어날 경우 0~캔버스 가로/세로길이 사이로 강제로 만드는 안전장치
-                    pencilMarker(at: clamped(location, in: geometry.size))
-                }
-            }
-//            .overlay(alignment: .topLeading) {
-//                // 화면에 접촉하고 있는 경우/호버/둘다 아닌 경우 표시 - 테스트 시 사용, 추후 삭제 혹은 변경 예정
-//                Text(state.isTouching ? "Touch" : (state.isHovering ? "Hover" : "Waiting"))
-//                    .font(.subheadline)
-//                    .foregroundStyle(.secondary)
-//                    .padding(12)
-//            }
-        }
-    }
-    
-    // Mock으로 펜슬을 테스트하는 경우 현재 위치/Tilt/Barrel Roll을 간접적으로 표시하기 위한 마커 - 테스트 시 사용
-    private func pencilMarker(at point: CGPoint) -> some View {
-        ZStack {
-            Circle()
-                .fill(.teal.opacity(0.16))
-                .frame(width: 76, height: 76)
-
-            Capsule()
-                .fill(.teal)
-                .frame(width: 12, height: 42 + CGFloat(state.tiltDegrees))
-                .offset(y: -(21 + CGFloat(state.tiltDegrees) / 2))
-
-            RoundedRectangle(cornerRadius: 4)
-                .fill(.indigo)
-                .frame(width: 112, height: 26)
-                .overlay(alignment: .trailing) {
-                    Circle()
-                        .fill(.orange)
-                        .frame(width: 14, height: 14)
-                        .padding(.trailing, 12)
-                }
-                .rotationEffect(.degrees(state.barrelRollDegrees))
-
-            Circle()
-                .fill(.primary)
-                .frame(width: 12, height: 12)
-        }
-        .position(point)
-    }
-    
-    // 캔버스 범위를 벗어날 경우 0~캔버스 가로/세로길이 사이로 강제로 만드는 안전장치
-    private func clamped(_ point: CGPoint, in size: CGSize) -> CGPoint {
-        CGPoint(
-            x: min(max(point.x, 0), size.width),
-            y: min(max(point.y, 0), size.height)
-        )
-    }
-}
 
 // 원형으로 게이지 나타내는 뷰
 // 내 점수가 전체에서 몇 %인지 계산 (0에서 1 사이의 값으로 변환)
@@ -279,17 +161,14 @@ struct PencilRangeGauge: View {
     let color: Color        // 게이지 색상
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .center) {
             HStack {
                 // tilte / 목표 범위에 들어가있는지에 따른 시각적 피드백(아이콘) - 추후 방식 수정할 예정(Hi-fi 참고)
                 Label(title, systemImage: isSatisfied ? "checkmark.circle.fill" : "xmark.circle")
                     .font(.headline)
                     .foregroundStyle(isSatisfied ? .green : .primary)
-                Spacer()
-//                Text("\(Int(value.rounded()))deg")      // 현재 입력값 숫자로 나타내는 용도(테스트에만 사용)
-//                    .font(.title3.weight(.bold))
-//                    .monospacedDigit()
             }
+            .padding(.bottom, 15)
 
             ZStack {        // 원형 게이지 표시
                 Circle()        // 범위 밑에 깔리는 원 테두리
@@ -304,10 +183,11 @@ struct PencilRangeGauge: View {
                     .frame(width: 12, height: 12)
             }
             .aspectRatio(1, contentMode: .fit)
+            .padding(.bottom, 10)
         }
-        .padding(14)
+        .padding(20)
         .frame(maxWidth: .infinity)
-        .background(Color(uiColor: .tertiarySystemBackground), in: RoundedRectangle(cornerRadius: 8))
+        .background(Color(uiColor: .tertiarySystemBackground), in: RoundedRectangle(cornerRadius: 20))
     }
     
     // 현재 펜슬값(value)이 전체 범위에서 어디쯤(%) 있는지를 구해서 나중에 바늘(valueAngle)을 돌릴 때 쓰려고 만든 것
@@ -378,23 +258,6 @@ struct PencilGaugeNeedle: View {        // 실제 펜슬 입력값을 바늘로 
         }
     }
 }
-
-//struct PencilRangeSlider: View {        // 목표 범위 조작하는 슬라이더 틀(추후 삭제 예정)
-//    let title: String
-//    @Binding var value: Double
-//    let range: ClosedRange<Double>
-//
-//    var body: some View {
-//        HStack(spacing: 12) {
-//            Text(title)
-//                .frame(width: 74, alignment: .leading)
-//            Slider(value: $value, in: range)
-//            Text("\(Int(value.rounded()))")
-//                .monospacedDigit()
-//                .frame(width: 38, alignment: .trailing)
-//        }
-//    }
-//}
 
 private func NormalizedDegrees(_ value: Double) -> Double {     // 정규화 - 360도 이상 각도를 360도 이하로 변환
     // truncatingRemainder(Double type 나머지 구하는 방법) - 360으로 나눴을 때 나머지
