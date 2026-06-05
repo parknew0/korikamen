@@ -14,7 +14,7 @@ struct Stage2View: View {
     @StateObject private var timer = CountdownTimer(duration: 180)   // 3분 (기획값)
 
     var body: some View {
-        ZStack {
+      ZStack {
             background
 
             VStack(spacing: 20) {

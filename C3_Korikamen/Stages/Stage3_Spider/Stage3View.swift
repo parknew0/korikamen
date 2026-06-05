@@ -188,7 +188,11 @@ struct Stage3View: View {
             .allowsHitTesting(false) //조작 방해 x
     }
 
-    var body: some View {
+    // 시간 임박(15초 이하) 경고 상태
+    private var isTimeWarning: Bool { timer.remaining <= 15 && timer.remaining > 0 }
+
+    // 화면 본체 (배경 + 씬 + 페이드 + 경고 가장자리)
+    private var content: some View {
         ZStack{
             background
                 .overlay(alignment: .trailing) { rightHUD }        // 오른쪽 고정 시키기
@@ -198,8 +202,13 @@ struct Stage3View: View {
                 .overlay(alignment:.center){ arrowHint }
 
             fadeLayer
+            WarningBorderView(isWarning: isTimeWarning)
         }
         .overlay(alignment: .top){ topHUD }
+    }
+
+    var body: some View {
+        content
         .padding(.leading, -10)
         .onAppear { timer.start() }
         .onChange(of: timer.isTimeOver) { _, over in if over { TickSound.stop(); onFail() } } // 시간초과 실패 시 소리 정지

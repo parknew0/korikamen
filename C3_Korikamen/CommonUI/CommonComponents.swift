@@ -12,6 +12,10 @@ import AVFoundation //사운드 파일 저장용
 
 
 
+
+
+//타이머 컴포넌트
+
 enum TickSound {
     static var player: AVAudioPlayer?
     static func play() {
@@ -21,12 +25,9 @@ enum TickSound {
     }
     static func stop() {
         player?.stop()
-        player = nil 
+        player = nil
     }
 }
-
-//타이머 컴포넌트
-
 // 사용시 : TimerHUDView(remaining: 스테이지별 시간  normalImage: , warningImage: ) <- 해보고 문제 있으면 말해주세요
 struct TimerHUDView: View {
     
@@ -37,7 +38,7 @@ struct TimerHUDView: View {
     var warningImage : String // 15초 이하시 이미지
     var warningThreshold: Double = 16 // 경고 기준
     
-   private var isWarning: Bool { //15초 이하 + 0 초과면 경고
+    private var isWarning: Bool { //15초 이하 + 0 초과면 경고
         remaining <= warningThreshold && remaining > 0
     }
     
@@ -46,7 +47,7 @@ struct TimerHUDView: View {
         let m = seconds / 60          // 분
         let s = seconds % 60          // 초
         return String(format: "%d:%02d", m, s)   // 1:05 처럼 초는 두 자리
-       }
+    }
     
     
     var body: some View {
@@ -64,7 +65,37 @@ struct TimerHUDView: View {
                 TickSound.play() //1회 재생
             }
         }
-       
+        
+    }
+}
+
+struct WarningBorderView: View { //15초 이하일 시 발동되는 경고 효과
+    let isWarning: Bool
+    @State private var pulse: Double = 0 //반복
+    
+    init(isWarning: Bool) {
+        self.isWarning = isWarning
+    }
+    
+    var body: some View {
+        RadialGradient(
+            colors: [.clear, .red.opacity(0.7)],
+            center:.center,
+            startRadius: 300,
+            endRadius: 800
+        )
+        .ignoresSafeArea()
+        .allowsHitTesting(false) //조작 방해 x
+        .opacity(isWarning ? pulse : 0) //경고 아니면 보이지 않도록
+        .onChange(of: isWarning) { _,warning in
+            if warning {
+                withAnimation(.easeInOut(duration:0.6).repeatForever(autoreverses: true)) {
+                    pulse = 1
+                }
+            } else {
+                withAnimation(.easeInOut(duration: 0.3)) {pulse = 0}
+            }
+        }
     }
 }
 #Preview {

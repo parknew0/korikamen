@@ -11,7 +11,7 @@ import SpriteKit
 struct Stage1View: View {
     let onClear: () -> Void
     let onFail: () -> Void
-
+    
     @EnvironmentObject private var pencil: PencilInput
     @StateObject private var manager = Stage1GameManager()
     @StateObject private var timer = CountdownTimer(duration: 60)   // 60초 임시값(TBD)
@@ -28,7 +28,10 @@ struct Stage1View: View {
     @State private var coffinX = Double(Stage1Transform.load().coffinPosition.x)
     @State private var coffinY = Double(Stage1Transform.load().coffinPosition.y)
     @State private var coffinScale = Double(Stage1Transform.load().coffinScale)
-
+    
+    // 시간 임박(15초 이하) 경고 상태
+    private var isTimeWarning: Bool { timer.remaining <= 15 && timer.remaining > 0 }
+    
     var body: some View {
         ZStack {
             Image("Stage1Background") //배경 추가
@@ -36,6 +39,8 @@ struct Stage1View: View {
                 .scaledToFill() //화면 꽉 채우기
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .ignoresSafeArea()
+            
+            WarningBorderView(isWarning: isTimeWarning)
             
             SpriteView(scene: scene, options: [.allowsTransparency]) // spritekit 배경 투명하게 설정
                 .ignoresSafeArea()
@@ -79,6 +84,7 @@ struct Stage1View: View {
             }
         }
     }
+    
     //테스트(타이머 확인용) <- 맥스 형님 확인 부탁드립니다.
     private var topHUD: some View {
         HStack{
