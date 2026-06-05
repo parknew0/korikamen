@@ -39,7 +39,7 @@ struct Stage3View: View {
                     .fill(Color.green.opacity(0.8))
                     .frame(height: h * (manager.targetMax - manager.targetMin))
                     .offset(y: -h * manager.targetMin)
-                    .animation(.easeInOut(duration: 0.5), value: manager.targetMin)// 범위 변경 시 애니메이션 효과 추가 
+                    .animation(.easeInOut(duration: 0.5), value: manager.targetMin)// 범위 변경 시 애니메이션 효과 추가
                     .animation(.easeInOut(duration: 0.5), value: manager.targetMax) // 범위 변경 시 애니메이션 효과 추가
                 RoundedRectangle(cornerRadius: 8)// 현재 게이지(노란색으로)
                     .fill(Color.yellow) //게이지 올라갈 때 하늘색으로
@@ -91,8 +91,6 @@ struct Stage3View: View {
                     }
                     
                 }
-            
-            
             VStack(spacing: 20) {
                 ZStack{
                     //scene 전한 구조로 정리
@@ -101,7 +99,7 @@ struct Stage3View: View {
                         // Scene1 — 관 (드래그로 뚜껑 열기)
                         SpriteView(scene: coffinScene, options: [.allowsTransparency])
                             .frame(width:300, height: 600)
-                      
+                        
                     case .removingWeb:
                         // Scene2 — 거미줄 게이지 (기존)
                         ZStack {
@@ -131,22 +129,23 @@ struct Stage3View: View {
                                 )
                         }
                         .offset(x: 0, y: 20)
-                      //  Text("게이지: \(Int(manager.gauge * 100))%")
+                        
+                        //  Text("게이지: \(Int(manager.gauge * 100))%")
                         //    .opacity(1.0)
                         //Text("성공: \(manager.successCount)/\(manager.requiredSuccessCount)   거미줄: \(manager.webLayerIndex)겹")
-                          //  .opacity(1.0)
+                        //  .opacity(1.0)
                         
                         
                     }
                 }
                 .overlay(alignment:.center){
                     if manager.scene == .openingLid { //관을 왼 - 오로 움직이라는 시각적 피드백 추가
-                       
-                            Image(systemName: "arrow.forward")
-                                .font(.system(size: 100)) // 원하는 크기 지정
-                                .foregroundColor(Color.white)
-                                .offset(x: -140, y: 20)
-                                .symbolEffect(.wiggle.byLayer, options: .repeat(.periodic(delay: 0.4)))
+                        
+                        Image(systemName: "arrow.forward")
+                            .font(.system(size: 100)) // 원하는 크기 지정
+                            .foregroundColor(Color.white)
+                            .offset(x: -140, y: 20)
+                            .symbolEffect(.wiggle.byLayer, options: .repeat(.periodic(delay: 0.4)))
                     }
                 }
                 
@@ -167,7 +166,7 @@ struct Stage3View: View {
                     .monospacedDigit() //숫자만 일정한 고정폭을 갖도록 조정
             }
             .padding(.top,20)
-           
+            
         }
         .padding(.leading, -10)
         .onAppear { timer.start() }
