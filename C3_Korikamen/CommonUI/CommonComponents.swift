@@ -8,13 +8,38 @@
 
 import Foundation
 import SwiftUI
+import AVFoundation //사운드 파일 저장용
+
+
+
+enum TickSound {
+    static var player: AVAudioPlayer?
+    static func play() {
+        guard let url = Bundle.main.url(forResource: "tick", withExtension: "m4a") else { return }
+        player = try? AVAudioPlayer(contentsOf: url)
+        player?.play()
+    }
+    static func stop() {
+        player?.stop()
+        player = nil 
+    }
+}
 
 //타이머 컴포넌트
 
+// 사용시 : TimerHUDView(remaining: 스테이지별 시간  normalImage: , warningImage: ) <- 해보고 문제 있으면 말해주세요
 struct TimerHUDView: View {
-    let remaining : Double
-    var tint: Color
-    var imageName: String
+    
+    let remaining : Double //스테이지별 제한 시간
+    var tint: Color = .white // 평상시 글자색
+    var warningTint : Color = .red //경고시 글자색
+    var normalImage : String // 평상시 이미지
+    var warningImage : String // 15초 이하시 이미지
+    var warningThreshold: Double = 16 // 경고 기준
+    
+   private var isWarning: Bool { //15초 이하 + 0 초과면 경고
+        remaining <= warningThreshold && remaining > 0
+    }
     
     // 초 → "분:초" 형식 (예: 90 → "1:30")
     private func timeText(_ seconds: Int) -> String {
@@ -23,19 +48,25 @@ struct TimerHUDView: View {
         return String(format: "%d:%02d", m, s)   // 1:05 처럼 초는 두 자리
        }
     
+    
     var body: some View {
         ZStack{
-            Image("Stage3tTimer")
+            Image(isWarning ? warningImage : normalImage) // 다른 스테이지에 맞게 수정
                 .resizable()
                 .frame(width: 200, height: 70)
-            
             Text(timeText(Int(remaining)))
                 .font(.custom("NovaMono-Regular", size: 50))
-                .foregroundStyle(tint)
+                .foregroundStyle(isWarning ? warningTint : tint) //시간 임박시 빨강
                 .offset(x: 25)
         }
+        .onChange(of: isWarning) { _, warning in
+            if isWarning { //iswarning이 켜지는 순간
+                TickSound.play() //1회 재생
+            }
+        }
+       
     }
 }
 #Preview {
-    TimerHUDView(remaining: 90, tint: .red, imageName: "Stage3tTimer")
+    TimerHUDView(remaining: 90, normalImage: "Stage3Timer", warningImage: "Stage3Timer")
 }

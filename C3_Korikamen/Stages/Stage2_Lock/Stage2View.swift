@@ -17,12 +17,15 @@ struct Stage2View: View {
             Text("스테이지 2 · 관 자물쇠 따기").font(.largeTitle).bold()
             Text("남은 시간: \(Int(timer.remaining))초").monospacedDigit()
             
-            LockGaugeView {
-                timer.stop()
-                onClear()
+          //  LockGaugeView {
+            //    timer.stop()
+            //    onClear()
+            // }
+            HStack {
+                Button("클리어 → 다음", action: onClear).buttonStyle(.borderedProminent)
+                Button("실패(테스트)", role: .destructive, action: onFail)
             }
-            
-            Button("실패(테스트)", role: .destructive, action: onFail)
+           
 
         }
         .padding()
