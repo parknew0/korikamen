@@ -17,12 +17,11 @@ struct Stage2LockCanvasView: View {        // 실제 펜슬을 접촉시키는 �
     var body: some View {       // 캔버스 디자인은 추후 수정 예정(Hi-Fi)
         GeometryReader { geometry in
             ZStack {
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(Color(uiColor: .systemGroupedBackground))
+//                RoundedRectangle(cornerRadius: 8)
+//                    .fill(Color(uiColor: .systemGroupedBackground))
 
                 Canvas { context, size in
-//                    _ = Path()
-//                    let _: CGFloat = 48
+
                     var path = Path()
                     let spacing: CGFloat = 48
                     
