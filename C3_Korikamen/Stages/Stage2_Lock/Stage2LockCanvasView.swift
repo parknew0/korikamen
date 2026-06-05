@@ -14,12 +14,9 @@ struct Stage2LockCanvasView: View {        // 실제 펜슬을 접촉시키는 �
     let holdGoal: Double
     let isClear: Bool
 
-    var body: some View {       // 캔버스 디자인은 추후 수정 예정(Hi-Fi)
+    var body: some View {
         GeometryReader { geometry in
             ZStack {
-//                RoundedRectangle(cornerRadius: 8)
-//                    .fill(Color(uiColor: .systemGroupedBackground))
-
                 Canvas { context, size in
 
                     var path = Path()
@@ -39,7 +36,7 @@ struct Stage2LockCanvasView: View {        // 실제 펜슬을 접촉시키는 �
                     context.stroke(path, with: .color(.secondary.opacity(0.22)), lineWidth: 1)
                 }
 
-                // Mock으로 펜슬을 테스트하는 경우 현재 위치/Tilt/Barrel Roll을 간접적으로 표시하기 위한 마커 - 테스트 시 사용
+                // 현재 위치/Tilt/Barrel Roll을 간접적으로 표시하기 위한 마커 - 테스트 시 사용?
                 if let location = state.location {
                     pencilMarker(
                         at: clamped(location, in: geometry.size)
