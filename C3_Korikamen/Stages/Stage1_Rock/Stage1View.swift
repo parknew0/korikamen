@@ -50,6 +50,7 @@ struct Stage1View: View {
                     Spacer()
                     toolButton
                 }
+                .overlay(alignment: .top){ topHUD }
                 Spacer()
             }
             .padding()
@@ -78,7 +79,28 @@ struct Stage1View: View {
             }
         }
     }
+    //테스트(타이머 확인용) <- 맥스 형님 확인 부탁드립니다.
+    private var topHUD: some View {
+        HStack{
+            // 좌측 상단 타이틀
+            Image("Stage1_Title")
+                .resizable()
+                .scaledToFit()
+                .frame(height: 60)
 
+            Spacer()
+
+            //우측 상단 타이머
+            TimerHUDView(remaining: timer.remaining,
+                         normalImage: "Stage12Timer",
+                         warningImage: "Stage3Timer")
+        }
+        .padding(.horizontal, 30)
+        .padding(.top, 20)
+        
+    //테스트(타이머 확인용)  <- 맥스 형님 확인 부탁드립니다.
+        
+    }
     /// 도구 전환 버튼(드릴 ↔ 끌).
     private var toolButton: some View {
         Button {
