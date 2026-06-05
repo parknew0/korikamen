@@ -8,7 +8,7 @@
 import SwiftUI
 import SpriteKit
 
-struct Stage3View: View {
+struct Stage3View: View { // 맥스 바보 
     let onClear: () -> Void
     let onFail: () -> Void
 
