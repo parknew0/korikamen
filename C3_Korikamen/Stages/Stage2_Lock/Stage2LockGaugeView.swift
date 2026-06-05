@@ -16,7 +16,7 @@ struct LockGaugeView: View {
     @State private var tiltRangeUpper = 55.0        // 목표 Tilt 범위(Upper)
     @State private var rollRangeLower = 160.0       // 목표 Barrel Roll 범위(Lower)
     @State private var rollRangeUpper = 200.0       // 목표 Barrel Roll 범위(Upper)
-    @State private var hapticFalloff = 30.0         // 햅틱 피드백을 줄 수 있는 범위(캔버스에 맞춰 수치 조정 필요)
+    @State private var hapticFalloff = 100.0         // 햅틱 피드백을 줄 수 있는 범위(캔버스에 맞춰 수치 조정 필요)
     @State private var holdDuration = 0.0           // 유지시간
     @State private var lastHoldTick: Date?          // 바로 직전에 시간을 쟀던 과거의 타이머 시점
     @State private var isClear = false              // 클리어 여부
