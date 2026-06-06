@@ -10,11 +10,20 @@ import SwiftUI
 
 struct StoryView: View {
     @StateObject var player: StoryPlayer //player의 index/beat가 바뀌면 화면 갱신되도록
-    
+    @State private var coverOpacity: Double = 0   // 전환막 투명도 서서히 걷혀 어두웠다가 화면이 드러날 때 사용
     var body: some View {
         let page = player.pages[player.index] //지금 그릴 컷
         
         ZStack {
+            
+            //배경 전환 애니메이션 추가
+            if case .fade(let color,_) = page.transition {
+                color
+                    .opacity(coverOpacity)
+                    .ignoresSafeArea()
+                    .allowsHitTesting(false)
+            }
+            
             //1. 배경(없으면 검은 화면이 보이도록)
             if let bg = page.background {
                 Image(bg).resizable().scaledToFill()
@@ -41,14 +50,15 @@ struct StoryView: View {
                                 .lineLimit(nil)
                                 .fixedSize(horizontal: false, vertical: true)   // 세로로 늘어나게
                                 .multilineTextAlignment(.leading)        // 왼쪽 정렬
-                                .font(Font.system(size: 20))
+                                .font(Font.system(size: 28))
                                 .foregroundStyle(Color.brown)
+                                .padding(.top, 24)
                                 .padding(.leading, 100)
                             Spacer()
                         }
                         
                     }
-                    .padding(.bottom, 20)
+                    .padding(.bottom, 40)
                 
                    
                 }
@@ -65,7 +75,7 @@ struct StoryView: View {
                             .scaledToFit()
                             .frame(width: 40)
                     }
-                    .padding(.bottom, 60)
+                    .padding(.bottom, 200)
                     .padding(.trailing, 100)
                     
                 }
@@ -76,6 +86,15 @@ struct StoryView: View {
         .onTapGesture {
             player.tap() // 화면 아무데나 탭 하면 텍스트나 이미지 스킵(바로 나오도록)
         }
+        .onAppear { // id(player.index) 와 함께, 컷 뜰 때 막 걷기
+            if case .fade(_, let duration) = page.transition {
+                coverOpacity = 1
+                withAnimation(.easeInOut(duration: duration)) {
+                    coverOpacity = 0
+                }
+            }
+        }
         .id(player.index) //컷 바뀌면 리마운트 다음 컷이 나오도록 -> 연출 리셋
+       
     }
 }

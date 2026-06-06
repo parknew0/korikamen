@@ -17,7 +17,7 @@ struct TypewriterText: View {
     @State private var timer: Timer?
     
     var body: some View {
-        Text(shown)
+        Text(.init(shown)) // ← String을 마크다운으로 해석
             .onAppear { start() }
             .onChange(of: beat) { _, newBeat in
                 if newBeat == .settled {
@@ -29,7 +29,7 @@ struct TypewriterText: View {
     private func start() {
         shown = ""
         var index = 0
-        Timer.scheduledTimer(withTimeInterval: speed, repeats: true) { t in
+        timer = Timer.scheduledTimer(withTimeInterval: speed, repeats: true) { t in
             
             guard index < fullText.count else { t.invalidate()
                 onFinished()
