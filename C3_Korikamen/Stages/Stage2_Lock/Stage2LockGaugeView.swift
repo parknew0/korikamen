@@ -93,16 +93,17 @@ struct LockGaugeView: View {
     
     private var gaugePanel: some View {     // 목표와 현재 Tilt/Barrel Roll값 확인 가능한 패널
         VStack(alignment: .center, spacing: 20) {
+            Spacer()        // 타이틀에 시각화가 너무 가까이 있어 사용
             // 클리어한 레벨 시각화
             HStack(spacing: 10) {
                 ForEach(0..<max(levels.count, 3), id: \.self) { index in
                     Circle()
-                        .fill(index < clearedLevelCount ? .green : .gray.opacity(0.3))
+                        .fill(index < clearedLevelCount ? .green : .stage2PanelBackground.opacity(0.4))
                         .frame(width: 25, height: 25)
                 }
             }
             
-            VStack(spacing: 15) {       // Tilt, Barrel Roll 원형 게이지
+            VStack(spacing: 20) {       // Tilt, Barrel Roll 원형 게이지
                 Stage2PencilRangeGauge(
                     title: "기울이기",                       // 어떤 게이지인지 나타내는 이름
                     value: pencil.state.tiltDegrees,        // Tilt 현재 값
