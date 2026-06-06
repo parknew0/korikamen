@@ -11,7 +11,7 @@ import Combine
 
 final class StoryPlayer: ObservableObject {
     
-    enum Beat { case revealing, settled } //현재 컷이 등장 중인지, 다 떴는지 구분
+    enum Beat : Equatable { case revealing, settled } //현재 컷이 등장 중인지, 다 떴는지 구분 (비교를 위해 Equatable 선언)
     @Published private(set) var index: Int = 0  //지금 몇 번쨰 컷
     @Published private(set) var beat: Beat = .revealing
     

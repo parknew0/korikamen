@@ -29,6 +29,7 @@ struct ContentView: View {
         } else {
             switch game.phase {
             case .main:     MainView(onStart: game.advance)
+            case .intro:    StoryView(player: StoryPlayer(pages: introStory, onFinish: game.advance)) // 인트로 추가
             case .stage(1): Stage1View(onClear: game.advance, onFail: game.fail)
             case .stage(2): Stage2View(onClear: game.advance, onFail: game.fail)
             case .stage(3): Stage3View(onClear: game.advance, onFail: game.fail)

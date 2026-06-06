@@ -6,6 +6,8 @@
 //
 
 import Foundation
+import SwiftUI
+
 
 let introStory: [StoryPage] = [
     //컷 1

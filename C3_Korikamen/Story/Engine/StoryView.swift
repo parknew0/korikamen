@@ -34,17 +34,39 @@ struct StoryView: View {
                 VStack{
                     Spacer()
                     ZStack{
-                        Image(panel.image).resizable().scaledToFit()
-                        Text(panel.text)
+                        Image(panel.image).resizable().scaledToFit().offset(x: 0, y: 80).frame(width: 1100,height: 400)
+                        
+                        HStack{
+                            TypewriterText(fullText: panel.text, beat: player.beat, onFinished: {player.settle() }) // 천천히 나오도록 추가
+                                .lineLimit(nil)
+                                .fixedSize(horizontal: false, vertical: true)   // 세로로 늘어나게
+                                .multilineTextAlignment(.leading)        // 왼쪽 정렬
+                                .font(Font.system(size: 20))
+                                .foregroundStyle(Color.brown)
+                                .padding(.leading, 100)
+                            Spacer()
+                        }
+                        
                     }
+                    .padding(.bottom, 20)
+                
+                   
                 }
             }
             
             if player.beat == .settled {
-                VStack{
+                HStack {
                     Spacer()
-                    Image(systemName: "arrowtriangle.down.fill")
-                        .padding()
+                    Spacer()
+                    VStack(alignment:.trailing){
+                        Spacer()
+                        Image("nextarrow")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 40)
+                    }
+                    .padding(.bottom, 60)
+                    .padding(.trailing, 100)
                     
                 }
             }
