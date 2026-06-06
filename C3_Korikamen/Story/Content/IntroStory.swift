@@ -102,3 +102,10 @@ let introStory: [StoryPage] = [
     )
 
 ]
+let stage1Story: [StoryPage] = [
+    StoryPage(background: nil, panel: StoryPanel(text: "스테이지1 클리어! — 짧은 스토리 컷")),
+    ]
+
+let stage2Story: [StoryPage] = [
+    StoryPage(background: nil, panel: StoryPanel(text: "스테이지2 클리어! — 짧은 스토리 컷")),
+]
