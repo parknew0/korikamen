@@ -33,9 +33,9 @@ struct StoryView: View {
             
             //2. 연출 이미지들
             ForEach(page.overlays) { overlay in
-                Image(overlay.image)
-                    .resizable()
-                    .scaledToFit()
+                OverlayLayer(overlay: overlay) //오버레이를 그리는 로직 추가
+                    // .resizable()
+                    // .scaledToFit()
             }
             
             //3. 텍스트 패널
@@ -52,7 +52,7 @@ struct StoryView: View {
                                 .multilineTextAlignment(.leading)        // 왼쪽 정렬
                                 .font(Font.system(size: 28))
                                 .foregroundStyle(Color.brown)
-                                .padding(.top, 24)
+                                .padding(.top, 32)
                                 .padding(.leading, 100)
                             Spacer()
                         }
