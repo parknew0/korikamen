@@ -33,6 +33,11 @@ final class StoryPlayer: ObservableObject {
         }
     }
     
+    //스킵 함수 : 남은 컷을 건너뛰고 즉시 이 스토리를 끝내도록 onfinish 사용
+    func skip() {
+        onFinish()
+    }
+    
     // 연출이 끝나 완성 상태로(view가 등장 끝나면 호출되도록)
     func settle() {
         beat = .settled

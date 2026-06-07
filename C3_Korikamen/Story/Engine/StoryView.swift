@@ -86,6 +86,21 @@ struct StoryView: View {
         .onTapGesture {
             player.tap() // 화면 아무데나 탭 하면 텍스트나 이미지 스킵(바로 나오도록)
         }
+        .overlay(alignment: .topTrailing) {
+            Button {
+                player.skip()
+            } label : {
+                Text("skip")
+                    .font(.system(size: 22, weight:.semibold))
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                    .background(Color.black.opacity(0.3), in: Capsule())
+            }
+            .padding(.top, 70)
+            .padding(.trailing, 40)
+            
+        }
         .onAppear { // id(player.index) 와 함께, 컷 뜰 때 막 걷기
             if case .fade(_, let duration) = page.transition {
                 coverOpacity = 1

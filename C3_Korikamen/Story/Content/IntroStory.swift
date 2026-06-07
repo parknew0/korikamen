@@ -148,3 +148,43 @@ let stage2Story: [StoryPage] = [
     ),
 
 ]
+
+let endingStory: [StoryPage] = [
+    //컷 1
+    StoryPage(
+        background: "bg_ending1", panel: StoryPanel(text: "드디어.. 학습지원금 졸업이다.." )
+    ),
+    //컷 2 - 검은 화면 -> 일단 제외 
+    /*StoryPage(
+        background: "bg_ending2", transition: .fade(.black,1.0)
+    ), */
+    //컷 3
+    StoryPage(
+        background: "bg_ending3"
+    ),
+    //컷 4
+    StoryPage(
+        background: "bg_ending4", transition:.fade(.black,1.0)
+    ),
+    //컷 4
+    StoryPage(
+        background: "bg_ending5", panel: StoryPanel(text: "\n\n 쟤 왜 갑자기 부자 됨? \n\n - 도굴 성공했대" )
+    ),
+    //컷 6
+    StoryPage(
+        background: "bg_ending6", panel: StoryPanel(text: "후후 110만원? 이건 **한끼값**이지." )
+    ),
+    //컷 7
+    StoryPage(
+        background: "bg_ending7", panel: StoryPanel(text: "다음은 여기인가?" )
+    ),
+    //컷 8
+    StoryPage(
+        background: "bg_ending8", panel: StoryPanel(text: "애플펜슬 + 아이패드, **이게 진짜 고고학이지..**" )
+    ),
+    
+    //컷 9 (엔딩 씬으로 이동)
+    StoryPage(
+        background: "bg_ending9"
+    ),
+]
