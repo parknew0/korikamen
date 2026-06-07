@@ -13,6 +13,7 @@ import SwiftUI
 
 struct MockPencilFeeder: View {
     @EnvironmentObject private var pencil: PencilInput
+    @State private var padPoint: CGPoint? = nil   // 패드 내부 마커 표시용(로컬 좌표)
     @State private var expanded = false
 
     var body: some View {
@@ -44,30 +45,38 @@ struct MockPencilFeeder: View {
         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 14))
     }
 
-    /// 드래그 → location/isTouching 설정 + roll(막대 방향)·pressure(점 크기) 시각화
+    /// 드래그 → 패드 양끝을 '화면 전체' 양끝에 대응시켜 location 설정.
     private var touchPad: some View {
-        GeometryReader { _ in
+        GeometryReader { geo in
             ZStack {
                 RoundedRectangle(cornerRadius: 8).fill(Color.gray.opacity(0.15))
-                Text("여기를 드래그 → 위치/접촉")
+                Text("여기를 드래그 → 화면 전체 위치")
                     .font(.caption2).foregroundStyle(.secondary).allowsHitTesting(false)
-                if pencil.state.isTouching, let loc = pencil.state.location {
+                if pencil.state.isTouching, let p = padPoint {
                     ZStack {
                         Circle().fill(.orange.opacity(0.5))
                             .frame(width: 14 + pencil.state.pressure * 26)
                         Rectangle().fill(.orange).frame(width: 2, height: 22)
                             .rotationEffect(.degrees(pencil.state.barrelRollDegrees))
                     }
-                    .position(loc)
+                    .position(p)
                 }
             }
             .contentShape(Rectangle())
             .gesture(DragGesture(minimumDistance: 0)
                 .onChanged { v in
-                    pencil.state.location = v.location
+                    // 패드 로컬 → 0~1 정규화 → 화면 좌표로 확대
+                    let nx = min(max(v.location.x / geo.size.width, 0), 1)
+                    let ny = min(max(v.location.y / geo.size.height, 0), 1)
+                    let screen = UIScreen.main.bounds.size
+                    pencil.state.location = CGPoint(x: nx * screen.width, y: ny * screen.height)
                     pencil.state.isTouching = true
+                    padPoint = CGPoint(x: nx * geo.size.width, y: ny * geo.size.height) // 마커는 패드 안
                 }
-                .onEnded { _ in pencil.state.isTouching = false })
+                .onEnded { _ in
+                    pencil.state.isTouching = false
+                    padPoint = nil
+                })
         }
         .frame(height: 120)
     }
