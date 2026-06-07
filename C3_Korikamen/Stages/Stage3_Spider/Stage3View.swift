@@ -75,8 +75,14 @@ struct Stage3View: View { // 맥스 바보
         Group {
             if manager.scene == .removingWeb {
                 VStack{
+                    ZStack{
+                        webCounter
+                    }
+                    .offset(x: -560, y: -50)
                     gaugeBar // scene2일 때 게이지바 추가
                         .padding(.trailing, 30)
+                    
+                        
                     // Text("게이지: \(Int(manager.gauge * 100))%")
                     //  .foregroundStyle(Color.white.opacity(0.8))
                     // Text("성공: \(manager.successCount)/\(manager.requiredSuccessCount)   거미줄: \(manager.webLayerIndex)겹")
@@ -152,7 +158,7 @@ struct Stage3View: View { // 맥스 바보
             if manager.scene == .openingLid {
                 Image(systemName: "arrow.forward")
                     .font(.system(size: 100)) // 원하는 크기 지정
-                    .foregroundColor(Color.white)
+                    .foregroundColor(Color.white.opacity(0.4))
                     .offset(x: -140, y: 20)
                     .symbolEffect(.wiggle.byLayer, options: .repeat(.periodic(delay: 0.4)))
             }
@@ -190,14 +196,26 @@ struct Stage3View: View { // 맥스 바보
 
     // 시간 임박(15초 이하) 경고 상태
     private var isTimeWarning: Bool { timer.remaining <= 15 && timer.remaining > 0 }
-
+    
+    //거미줄 제거 진행도
+    private var webCounter: some View {
+        ZStack{
+            Image("WebCounter")
+                .resizable()
+                .scaledToFit()
+                .frame(height: 70)
+            Text("\(manager.successCount)")
+                .font(Font.custom("NovaMono-Regular", size: 36))
+                .foregroundStyle(Color.white.opacity(0.8))
+                .offset(x: -15, y: 0)
+        }
+    }
     // 화면 본체 (배경 + 씬 + 페이드 + 경고 가장자리)
     private var content: some View {
         ZStack{
             background
                 .overlay(alignment: .trailing) { rightHUD }        // 오른쪽 고정 시키기
                 .overlay(alignment: .bottomTrailing) { bottomButtons } // 마찬가지로 우측 하단에 고정
-
             sceneContent
                 .overlay(alignment:.center){ arrowHint }
 
@@ -247,7 +265,7 @@ struct Stage3View: View { // 맥스 바보
         .onChange(of: pencil.state.squeezePhase){ _, phase in
             switch phase {
             case .began, .changed: manager.beginSqueeze() // 스퀴즈 시작 + 누르기 : 게이지 증가 시작
-            case .ended: manager.endSqueeze() // 스퀴즈 종료 -> 판정
+            case .ended: manager.endSqueeze();PumpSound.play() // 스퀴즈 종료 -> 판정 + 바람 소리 나오도록
             case .none: break // ignore
             }
         }

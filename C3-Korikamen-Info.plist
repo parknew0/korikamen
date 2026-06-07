@@ -4,5 +4,9 @@
 <dict>
 	<key></key>
 	<string></string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>NovaMono-Regular</string>
+	</array>
 </dict>
 </plist>

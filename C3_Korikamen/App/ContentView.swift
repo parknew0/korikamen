@@ -33,8 +33,13 @@ struct ContentView: View {
             case .stage(1): Stage1View(onClear: game.advance, onFail: game.fail)
             case .stage(2): Stage2View(onClear: game.advance, onFail: game.fail)
             case .stage(3): Stage3View(onClear: game.advance, onFail: game.fail)
-            case .stage:    EmptyView()
-            case .ending:   EndingView(onReplay: game.advance)
+    
+            case .interlude(1): StoryView(player: StoryPlayer(pages: stage1Story, onFinish: game.advance))   // ← 추가
+            case .interlude(2): StoryView(player: StoryPlayer(pages: stage2Story, onFinish: game.advance))   // ← 추가
+                
+            case .interlude: EmptyView()                                                                  // ← 안전장치 추가
+            case .stage:     EmptyView()
+            case .ending:    EndingView(onReplay: game.advance)
             }
         }
     }

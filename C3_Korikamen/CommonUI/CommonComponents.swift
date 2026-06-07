@@ -28,6 +28,18 @@ enum TickSound {
         player = nil
     }
 }
+
+//바람 소리 컴포넌트
+
+enum PumpSound {
+    static var player: AVAudioPlayer?
+    static func play() {
+        guard let url = Bundle.main.url(forResource: "airpump", withExtension: "m4a") else { return }
+        player = try? AVAudioPlayer(contentsOf: url)
+        player?.play()
+    }
+}
+
 // 사용시 : TimerHUDView(remaining: 스테이지별 시간  normalImage: , warningImage: ) <- 해보고 문제 있으면 말해주세요
 struct TimerHUDView: View {
     
@@ -56,7 +68,7 @@ struct TimerHUDView: View {
                 .resizable()
                 .frame(width: 200, height: 70)
             Text(timeText(Int(remaining)))
-                .font(.custom("NovaMono-Regular", size: 50))
+                .font(Font.custom("NovaMono-Regular", size: 50))
                 .foregroundStyle(isWarning ? warningTint : tint) //시간 임박시 빨강
                 .offset(x: 25)
         }
@@ -65,7 +77,7 @@ struct TimerHUDView: View {
                 TickSound.play() //1회 재생
             }
         }
-        .onDisappear{TickSound.stop()} //타이머가 사라지면 소리 정지되도록 
+        .onDisappear{TickSound.stop()} //타이머가 사라지면 소리 정지되도록
         
     }
 }

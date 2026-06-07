@@ -102,3 +102,89 @@ let introStory: [StoryPage] = [
     )
 
 ]
+let stage1Story: [StoryPage] = [
+    //컷 1
+    StoryPage(background: "bg_stage1_1"),
+    //컷 2
+    StoryPage(
+        background: "bg_stage1_2", panel: StoryPanel(text: "철컥철컥.. 안열리는데..? 아 고대 이집트 자물쇠구나")
+    ),
+    //컷 3
+    StoryPage(
+        background: "bg_stage1_3", panel: StoryPanel(text: "어.? 섬세하지 못한 자, **왕의 재산에 닿을 수 없다...?**")
+    )
+    ]
+
+let stage2Story: [StoryPage] = [
+    //컷 1
+    StoryPage(background: "bg_stage2_1"),
+    //컷 2
+    StoryPage(
+        background: "bg_stage2_2", panel: StoryPanel(text: "학습지원금 탈출이 얼마 남지 않았다.")
+    ),
+    //컷 3
+    StoryPage(
+        background: "bg_stage2_3", panel: StoryPanel(text: "우선 관의 문을 빨리 열어야 한다.")
+    ),
+    //컷 4 -> 파피루스 이펙트 필요
+    StoryPage(
+        background: "bg_stage2_4",
+        overlays: [
+            StoryOverlay(image: "layout_stage2_prelude_4", position: .bottomLeading, appearDelay: 0.3)
+        ], //파피루스 위치 -> 좌측 하단
+        panel: StoryPanel(text: "어 이건 뭐지/././??")
+    ),
+    //컷 5
+    StoryPage(
+        background: "bg_stage2_5"),
+    
+    //컷 6
+    StoryPage(
+        background: "bg_stage2_6", panel: StoryPanel(text: "이집트 사람들 말 겁나 많네")
+    ),
+    //컷 7
+    StoryPage(
+        background: "bg_stage2_6", panel: StoryPanel(text: "그래 이제는 문을 열어보자. **왕의 보물을 탐내는 자, 시련의 실에 갇히리라!**")
+    ),
+
+]
+
+let endingStory: [StoryPage] = [
+    //컷 1
+    StoryPage(
+        background: "bg_ending1", panel: StoryPanel(text: "드디어.. 학습지원금 졸업이다.." )
+    ),
+    //컷 2 - 검은 화면 -> 일단 제외 
+    /*StoryPage(
+        background: "bg_ending2", transition: .fade(.black,1.0)
+    ), */
+    //컷 3
+    StoryPage(
+        background: "bg_ending3"
+    ),
+    //컷 4
+    StoryPage(
+        background: "bg_ending4", transition:.fade(.black,1.0)
+    ),
+    //컷 4
+    StoryPage(
+        background: "bg_ending5", panel: StoryPanel(text: "\n\n 쟤 왜 갑자기 부자 됨? \n\n - 도굴 성공했대" )
+    ),
+    //컷 6
+    StoryPage(
+        background: "bg_ending6", panel: StoryPanel(text: "후후 110만원? 이건 **한끼값**이지." )
+    ),
+    //컷 7
+    StoryPage(
+        background: "bg_ending7", panel: StoryPanel(text: "다음은 여기인가?" )
+    ),
+    //컷 8
+    StoryPage(
+        background: "bg_ending8", panel: StoryPanel(text: "애플펜슬 + 아이패드, **이게 진짜 고고학이지..**" )
+    ),
+    
+    //컷 9 (엔딩 씬으로 이동)
+    StoryPage(
+        background: "bg_ending9"
+    ),
+]
