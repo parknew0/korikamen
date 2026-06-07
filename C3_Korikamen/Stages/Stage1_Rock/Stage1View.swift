@@ -71,6 +71,8 @@ struct Stage1View: View {
             applyTransform()   // 저장된(또는 기본) 위치·배율을 씬에 반영 — 릴리스 포함 항상
             timer.start()
         }
+        .onChange(of: pencil.state.location)   { _, _ in feedPencil() }
+        .onChange(of: pencil.state.isTouching) { _, _ in feedPencil() }
         .onChange(of: editMode) { _, on in scene.editMode = on }
         .onChange(of: showHitboxes) { _, on in scene.showHitboxes = on }
         .onChange(of: showTouchMap) { _, on in scene.showTouchMap = on }
@@ -197,5 +199,11 @@ struct Stage1View: View {
                         pileScale: CGFloat(pileScale),
                         coffinPosition: CGPoint(x: coffinX, y: coffinY),
                         coffinScale: CGFloat(coffinScale)).save()
+    }
+    
+    /// 계약(PencilState)의 위치·접촉을 씬에 전달 — Stage2/3와 동일한 입력 경로.
+    private func feedPencil() {
+        scene.applyPencil(viewLocation: pencil.state.isTouching ? pencil.state.location : nil,
+                          isActive: pencil.state.isTouching)
     }
 }
