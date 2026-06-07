@@ -26,6 +26,8 @@ final class GameManager: ObservableObject {
     private(set) var stageTimes: [Int: Double] = [:]
     var totalPlayTime: Double { stageTimes.values.reduce(0, +) }
     
+    private var stageStartTime: Date? // 현재 스테이지에 들어온 시각
+    
     private lazy var machine = GKStateMachine(states: [
         MainState(self), IntroState(self), Stage1State(self), Stage2State(self),
         Stage3State(self), EndingState(self), Interlude1State(self), Interlude2State(self), //추가
@@ -36,18 +38,22 @@ final class GameManager: ObservableObject {
     func recordTime(stage: Int, elapsed: Double) { stageTimes[stage] = elapsed }
 
     func advance() { // 전환 로직 추가
-        switch phase {
-        case .main:     machine.enter(IntroState.self)
-        case .intro:    machine.enter(Stage1State.self)
-        case .stage(1): machine.enter(Interlude1State.self)
-        case .interlude(1): machine.enter(Stage2State.self)
-        case .stage(2): machine.enter(Interlude2State.self)
-        case .interlude(2): machine.enter(Stage3State.self)
-        case .stage(3): machine.enter(EndingState.self)
-        case .ending:   machine.enter(MainState.self)
-        case .stage:    break
-        case .interlude: break
+        //스테이지를 클리어하고 떠나는 순간, 걸린 시간 저장
+        if case .stage(let n) = phase, let start = stageStartTime {
+            recordTime(stage: n, elapsed: Date().timeIntervalSince(start))
         }
+            switch phase {
+            case .main:     machine.enter(IntroState.self)
+            case .intro:    machine.enter(Stage1State.self)
+            case .stage(1): machine.enter(Interlude1State.self)
+            case .interlude(1): machine.enter(Stage2State.self)
+            case .stage(2): machine.enter(Interlude2State.self)
+            case .interlude(2): machine.enter(Stage3State.self)
+            case .stage(3): machine.enter(EndingState.self)
+            case .ending:   machine.enter(MainState.self)
+            case .stage:    break
+            case .interlude: break
+            }
     }
 
     func fail() { if case .stage(let n) = phase { failedStage = n } }
@@ -61,7 +67,9 @@ final class GameManager: ObservableObject {
         machine.enter(MainState.self)
     }
 
-    fileprivate func updatePhase(_ p: GamePhase) { phase = p }
+    fileprivate func updatePhase(_ p: GamePhase) { phase = p
+        if case .stage = p { stageStartTime = Date() } // 스테이지 진입 시각 저장
+    }
 }
 
 class GameBaseState: GKState {
