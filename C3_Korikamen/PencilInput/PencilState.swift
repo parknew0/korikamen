@@ -22,7 +22,7 @@ enum SqueezePhase {
     case ended      // 손 뗌(해당 프레임 1회)
 }
 
-enum PencilAngle {
+enum PencilAngle {            // Barrel Roll 각도 정규화
     static func normalizedDegrees(_ value: Double) -> Double {
         let degrees = value.truncatingRemainder(dividingBy: 360)
         return degrees >= 0 ? degrees : degrees + 360       // 음수 각도 양수로 변환

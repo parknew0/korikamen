@@ -44,6 +44,9 @@ struct Stage1View: View {
             
             SpriteView(scene: scene, options: [.allowsTransparency]) // spritekit 배경 투명하게 설정
                 .ignoresSafeArea()
+                .overlay {
+                    RealPencilFeeder()
+                }
 
             // 상단 HUD: 남은 시간 + 도구 전환
             VStack {

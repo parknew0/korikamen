@@ -93,8 +93,6 @@ final class PencilCaptureView: UIView {
             if !state.isTouching {
                 state.location = nil
             }
-
-            pencil?.state = state
             return
         }
 
