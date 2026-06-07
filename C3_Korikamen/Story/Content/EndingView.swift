@@ -14,6 +14,7 @@ struct EndingView: View {
     
     @EnvironmentObject var game: GameManager //총 플레이타임 game.totalPlayTime 사용
     @StateObject private var player: StoryPlayer // 시나리오 컷 관리
+    @State private var pulse = false      // 뷰 프로퍼티에 추가
     
     init(onReplay: @escaping () -> Void) { // 마지막 터치시 홈으로 돌아가도록
         self.onReplay = onReplay
@@ -32,10 +33,13 @@ struct EndingView: View {
                     
                     
                     Text("계속하려면 화면을 탭하세요")
-                        .offset(x: 350, y: 80)
+                        .offset(x: 350, y: 50)
                         .font(Font.custom("NovaMono-Regular", size: 20))
                         .foregroundStyle(Color.white)
-                        .opacity(0.8)
+                        .opacity(pulse ? 1.0 : 0.3) //희미해졌다가 선명해지는 연출 추가
+                        .onAppear {
+                            withAnimation(.easeInOut(duration: 0.9).repeatForever(autoreverses: true)){pulse = true}
+                        }
                 }
               
             }

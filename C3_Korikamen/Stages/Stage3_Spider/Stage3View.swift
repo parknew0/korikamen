@@ -152,7 +152,7 @@ struct Stage3View: View { // 맥스 바보
             if manager.scene == .openingLid {
                 Image(systemName: "arrow.forward")
                     .font(.system(size: 100)) // 원하는 크기 지정
-                    .foregroundColor(Color.white)
+                    .foregroundColor(Color.white.opacity(0.4))
                     .offset(x: -140, y: 20)
                     .symbolEffect(.wiggle.byLayer, options: .repeat(.periodic(delay: 0.4)))
             }
