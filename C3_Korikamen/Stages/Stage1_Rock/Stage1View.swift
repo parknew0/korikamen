@@ -48,10 +48,6 @@ struct Stage1View: View {
             // 상단 HUD: 남은 시간 + 도구 전환
             VStack {
                 HStack {
-                    Text("남은 시간: \(Int(timer.remaining))초")
-                        .monospacedDigit()
-                        .padding(8)
-                        .background(.ultraThinMaterial, in: Capsule())
                     Spacer()
                     toolButton
                 }
