@@ -47,16 +47,14 @@ struct Stage1View: View {
 
             // 상단 HUD: 남은 시간 + 도구 전환
             VStack {
+                topHUD
+                Spacer()
                 HStack {
-                    Text("남은 시간: \(Int(timer.remaining))초")
-                        .monospacedDigit()
-                        .padding(8)
-                        .background(.ultraThinMaterial, in: Capsule())
                     Spacer()
                     toolButton
+                        .padding(.horizontal, 30)
+                        .padding(.bottom, 20)
                 }
-                .overlay(alignment: .top){ topHUD }
-                Spacer()
             }
             .padding()
 
@@ -71,6 +69,8 @@ struct Stage1View: View {
             applyTransform()   // 저장된(또는 기본) 위치·배율을 씬에 반영 — 릴리스 포함 항상
             timer.start()
         }
+        .onChange(of: pencil.state.location)   { _, _ in feedPencil() }
+        .onChange(of: pencil.state.isTouching) { _, _ in feedPencil() }
         .onChange(of: editMode) { _, on in scene.editMode = on }
         .onChange(of: showHitboxes) { _, on in scene.showHitboxes = on }
         .onChange(of: showTouchMap) { _, on in scene.showTouchMap = on }
@@ -107,16 +107,24 @@ struct Stage1View: View {
     //테스트(타이머 확인용)  <- 맥스 형님 확인 부탁드립니다.
         
     }
-    /// 도구 전환 버튼(드릴 ↔ 끌).
+    
     private var toolButton: some View {
         Button {
             manager.selectTool(manager.tool == .drill ? .chisel : .drill)
         } label: {
-            Label(manager.tool == .drill ? "드릴" : "끌",
-                  systemImage: manager.tool == .drill ? "wrench.and.screwdriver.fill" : "hammer.fill")
+            ZStack {
+                Circle()
+                    .fill(.clear)
+                    .glassEffect(.clear, in: Circle())
+                    .opacity(0.75)                 // ← 배경만 더 투명하게 (아이콘 영향 X)
+                Image(manager.tool == .drill ? "drill" : "chisel")
+                    .resizable()
+                    .scaledToFit()
+                    .padding(28)
+            }
+            .frame(width: 120, height: 120)
         }
-        .buttonStyle(.borderedProminent)
-        .tint(manager.tool == .drill ? .orange : .blue)
+        .buttonStyle(.plain)
     }
 
     #if DEBUG
@@ -197,5 +205,11 @@ struct Stage1View: View {
                         pileScale: CGFloat(pileScale),
                         coffinPosition: CGPoint(x: coffinX, y: coffinY),
                         coffinScale: CGFloat(coffinScale)).save()
+    }
+    
+    /// 계약(PencilState)의 위치·접촉을 씬에 전달 — Stage2/3와 동일한 입력 경로.
+    private func feedPencil() {
+        scene.applyPencil(viewLocation: pencil.state.isTouching ? pencil.state.location : nil,
+                          isActive: pencil.state.isTouching)
     }
 }

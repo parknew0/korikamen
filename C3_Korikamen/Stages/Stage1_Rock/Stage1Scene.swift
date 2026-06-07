@@ -88,9 +88,8 @@ final class Stage1Scene: SKScene {
 
     override init(size: CGSize) {
         super.init(size: size)
-        scaleMode = .aspectFit
-        // backgroundColor = SKColor(white: 0.12, alpha: 1)
-        backgroundColor = SKColor.clear // 노튼: 배경 지움 
+        scaleMode = .aspectFill
+        backgroundColor = SKColor.clear
     }
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
@@ -176,49 +175,42 @@ final class Stage1Scene: SKScene {
         hitTester?.rockColor(id) ?? Stage1Layout.placeholderColor(id)
     }
 
-    // MARK: - 입력
+    // MARK: - 입력 (계약 경유: PencilState만 사용. 씬 자체 터치는 DEBUG 배치모드 전용)
 
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        guard let t = touches.first else { return }
-        let p = t.location(in: self)
-
-        if editMode {
-            #if DEBUG
-            debugBeginDrag(at: p)
-            #endif
-            return
-        }
-
+    /// 뷰(PencilInput.state)에서 조준/접촉을 주입받는 '유일한' 재생 입력 경로.
+    /// raw 터치 대신 이걸로만 깎기 진행 → Stage2/3와 동일하게 계약에 의존.
+    func applyPencil(viewLocation: CGPoint?, isActive: Bool) {
+        guard !editMode else { return }
+        guard isActive, let vp = viewLocation else { endTouch(); return }
+        let p = convertPoint(fromView: vp)        // 뷰 좌표(pt) → 씬 좌표
+        let wasActive = activeTouch != nil
         activeTouch = p
         #if DEBUG
-        debugUpdatePick(at: p)                                   // 무엇이 잡혔는지 기록
+        debugUpdatePick(at: p)
         #endif
-        if manager?.tool == .chisel { interact(at: p, dt: 0) }  // 끌은 누른 순간 1회
+        if manager?.tool == .chisel, !wasActive { interact(at: p, dt: 0) }  // 끌: 막 닿은 순간 1회
     }
 
+    #if DEBUG
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard editMode, let t = touches.first else { return }   // 배치모드 드래그 전용
+        debugBeginDrag(at: t.location(in: self))
+    }
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        guard let t = touches.first else { return }
-        let p = t.location(in: self)
-        if editMode {
-            #if DEBUG
-            debugMoveDrag(at: p)
-            #endif
-        } else {
-            activeTouch = p
-            #if DEBUG
-            debugUpdatePick(at: p)
-            #endif
-        }
+        guard editMode, let t = touches.first else { return }
+        debugMoveDrag(at: t.location(in: self))
     }
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        if editMode { debugEndTouch() }                         // 배치모드일 때만 raw 종료 처리
+    }
+    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
+        if editMode { debugEndTouch() }
+    }
+    #endif
 
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) { endTouch() }
-    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) { endTouch() }
     private func endTouch() {
         activeTouch = nil
         effects?.stopDrillShake(); effects?.stopDrillDebris()   // 손 떼면 드릴 진동/파편 정지
-        #if DEBUG
-        debugEndTouch()
-        #endif
     }
 
     /// 한 지점에 도구를 적용: 산 돌이 있으면 깎고, 없고 관이 노출돼 있으면 실패.
