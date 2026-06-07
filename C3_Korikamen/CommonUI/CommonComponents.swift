@@ -28,6 +28,18 @@ enum TickSound {
         player = nil
     }
 }
+
+//바람 소리 컴포넌트
+
+enum PumpSound {
+    static var player: AVAudioPlayer?
+    static func play() {
+        guard let url = Bundle.main.url(forResource: "airpump", withExtension: "m4a") else { return }
+        player = try? AVAudioPlayer(contentsOf: url)
+        player?.play()
+    }
+}
+
 // 사용시 : TimerHUDView(remaining: 스테이지별 시간  normalImage: , warningImage: ) <- 해보고 문제 있으면 말해주세요
 struct TimerHUDView: View {
     

@@ -244,7 +244,7 @@ struct Stage3View: View { // 맥스 바보
         .onChange(of: pencil.state.squeezePhase){ _, phase in
             switch phase {
             case .began, .changed: manager.beginSqueeze() // 스퀴즈 시작 + 누르기 : 게이지 증가 시작
-            case .ended: manager.endSqueeze() // 스퀴즈 종료 -> 판정
+            case .ended: manager.endSqueeze();PumpSound.play() // 스퀴즈 종료 -> 판정 + 바람 소리 나오도록
             case .none: break // ignore
             }
         }
