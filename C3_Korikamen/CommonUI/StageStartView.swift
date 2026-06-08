@@ -20,29 +20,25 @@ struct StageStartView<Content: View>: View {
 
     var body: some View {
         if phase == .playing {
-            content()                                   // 실제 게임 (탭 가로채지 않음)
+            content()
         } else {
             ZStack {
-                Image(titleImage)                       // 시작화면
-                    .resizable()
-                    .scaledToFill()
-                    .ignoresSafeArea()
-
+                // 튜토리얼: 파피루스 하단 밀착 + 우측 하단 시작 버튼
                 if phase == .tutorial {
                     Color.black.opacity(0.35).ignoresSafeArea()
                     VStack {
                         Spacer()
                         Image(tutorialImage)
                             .resizable()
-                            .scaledToFit()
+                            .scaledToFit()                  // 비율 유지(안 깨짐)
                             .frame(maxWidth: .infinity)
-                            .overlay(alignment: .bottomTrailing) {        // 파피루스 우측 하단
-                                Button { phase = .playing } label: {       // 이 버튼이 게임 시작
+                            .overlay(alignment: .bottomTrailing) {
+                                Button { phase = .playing } label: {
                                     Image(startButtonImage)
                                         .resizable().scaledToFit().frame(width: 200)
                                 }
                                 .buttonStyle(.plain)
-                                .padding(.trailing, 90)
+                                .padding(.trailing, 120)    // 왼쪽으로 옮긴 값
                                 .padding(.bottom, 40)
                             }
                     }
@@ -50,13 +46,19 @@ struct StageStartView<Content: View>: View {
                     .transition(.move(edge: .bottom).combined(with: .opacity))
                 }
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(                                     // ← 메인화면과 동일 방식
+                Image(titleImage)
+                    .resizable()
+                    .scaledToFill()                         // 비율 유지하며 채움
+                    .ignoresSafeArea()
+            )
             .contentShape(Rectangle())
-            // 게임 시작은 버튼으로만, 화면 탭은 시작화면→튜토리얼 전환만
             .onTapGesture {
                 if phase == .title {
                     withAnimation(.easeInOut(duration: 0.25)) { phase = .tutorial }
                 }
-                // tutorial 단계에선 화면 탭 무시 → 우측 하단 버튼을 눌러야 게임 시작
+                // tutorial 단계: 화면 탭 무시 → 버튼으로만 시작
             }
         }
     }
