@@ -221,7 +221,7 @@ struct LockGaugeView: View {
     
     // 랜덤으로 목표 범위 만들기
     private func makeRandomLevel(tiltWidth: Double, rollWidth: Double) -> Stage2LockLevel {
-        let tiltStart = Double.random(in: 5...(85 - tiltWidth))
+        let tiltStart = Double.random(in: 5...(70 - tiltWidth))
         let rollStart = Double.random(in: 0..<360)
 
         return Stage2LockLevel(
