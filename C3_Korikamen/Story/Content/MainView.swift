@@ -27,7 +27,7 @@ struct MainView: View {
                 Spacer()
                 Button { onStart() } label: {
                     Image("btn_start_middledown_square_gold")
-                        .resizable().scaledToFit().frame(width: 280)
+                        .resizable().scaledToFit().frame(width: 150)
                 }
                 .buttonStyle(.plain)
                 .padding(.bottom, 60)
