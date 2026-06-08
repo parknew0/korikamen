@@ -1,11 +1,11 @@
 {
   "images" : [
     {
-      "filename" : "stage2title.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
+      "filename" : "stage3title.png",
       "idiom" : "universal",
       "scale" : "2x"
     },

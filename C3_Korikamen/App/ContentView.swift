@@ -33,17 +33,17 @@ struct ContentView: View {
                 
             // 각 스테이지를 시작화면+튜토리얼 게이트로 감쌈
             case .stage(1):
-                StageStartView(titleImage: "stage1title",
+                StageStartView(titleImage: "Stage1_Main",
                     tutorialImage: "img_stage1tutorial_papyrus") {
                         Stage1View(onClear: game.advance, onFail: game.fail)
                     }
             case .stage(2):
-                StageStartView(titleImage: "stage2title",
+                StageStartView(titleImage: "Stage2_Main",
                     tutorialImage: "img_stage2tutorial_papyrus") {
                         Stage2View(onClear: game.advance, onFail: game.fail)
                     }
             case .stage(3):
-                StageStartView(titleImage: "stage3title",
+                StageStartView(titleImage: "Stage3_Main",
                     tutorialImage: "img_stage3tutorial_papyrus",
                         startButtonImage: "btn_stage3tutorial(btn_normal)_start_normal") {   // ← Stage3 전용
                     Stage3View(onClear: game.advance, onFail: game.fail)
