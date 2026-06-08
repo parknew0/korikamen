@@ -86,6 +86,9 @@ struct LockGaugeView: View {
                 isClear: isClear
             )
             .frame(width: 100, height: 150)
+            .overlay {      // 캔버스 안에만 펜슬 입력을 받게 하기 위해 이곳에 사용
+                RealPencilFeeder()
+            }
             .position(x: size.width * 0.275, y: size.height * 0.43)
         }
         .padding(20)
@@ -110,7 +113,7 @@ struct LockGaugeView: View {
                     isSatisfied: tiltRangeSatisfied,        // 목표 Tilt 범위에 현재 tilt 값이 들어가있는가
                     targetLower: min(tiltRangeLower, tiltRangeUpper),
                     targetUpper: max(tiltRangeLower, tiltRangeUpper),
-                    gaugeRange: 0...90,     // Tilt 범위는 0도~90도
+                    gaugeRange: 0...70,     // Tilt 범위는 0도~70도
                     color: .stage2TiltPanel,
                     circleStrokeColor: .stage2TiltCircleStroke
                 )

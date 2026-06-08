@@ -67,8 +67,8 @@ final class PencilCaptureView: UIView {     // Pencil 입력을 받는 투명한
         state.location = touch.location(in: self)       // 현재 좌표
         state.isTouching = true         // 접촉 여부
         
-        // 기존 altitudeAngle 입력(0° = 눕힘, 90° = 세움)를 계약 사항에 따라 Tilt(0° = 세움, 90° = 눕힘)으로 정의
-        state.tiltDegrees = 90 - touch.altitudeAngle.degrees
+        // 기존 altitudeAngle 입력(0° = 눕힘 - 20 이하 눕히지 않도록, 90° = 세움)를 계약 사항에 따라 Tilt(0° = 세움, 90° = 눕힘 - 최대 70까지 눕히도록)으로 정의
+        state.tiltDegrees = min(90 - touch.altitudeAngle.degrees, 70)
         state.barrelRollDegrees = PencilAngle.normalizedDegrees(touch.rollAngle.degrees)        // 펜의 회전 각도 정규화
         
         pencil?.state = state
