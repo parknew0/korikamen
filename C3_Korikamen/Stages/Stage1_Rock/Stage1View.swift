@@ -98,11 +98,11 @@ struct Stage1View: View {
     private var topHUD: some View {
         HStack{
             // 좌측 상단 타이틀
-            Image("Stage1_Title")
+           /* Image("Stage1_Title")
                 .resizable()
                 .scaledToFit()
                 .frame(height: 60)
-
+            */
             Spacer()
 
             //우측 상단 타이머

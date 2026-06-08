@@ -27,6 +27,22 @@ enum MainBGM {
     }
 }
 
+// 텍스트 사운드 컴포넌트
+enum SpeakSound {
+    static var player: AVAudioPlayer?
+    static func start() {
+        if player?.isPlaying == true { return }
+        guard let url = Bundle.main.url(forResource: "speak_txt", withExtension: "m4a") else { return }
+        player = try? AVAudioPlayer(contentsOf: url)
+        player?.numberOfLoops = -1     // 타이핑이 길면 반복 (보통은 중간에 stop됨)
+        player?.play()
+    }
+    static func stop() {
+        player?.stop()
+        player = nil
+    }
+}
+
 // 시나리오 전개시 클릭 소리 컴포넌트
 enum clickSound {
     static var player: AVAudioPlayer?
