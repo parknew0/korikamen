@@ -119,7 +119,7 @@ extension PencilCaptureView: UIPencilInteractionDelegate {
             applyHoverPose(pose, to: &state)
         }
         
-//        pencil?.state = state
+        pencil?.state = state
     }
     
     // Squeeze 시 알맞은 스퀴즈 상태 저장
