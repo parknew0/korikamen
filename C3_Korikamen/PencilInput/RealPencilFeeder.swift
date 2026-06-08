@@ -101,7 +101,7 @@ final class PencilCaptureView: UIView {     // Pencil 입력을 받는 투명한
         state.location = recognizer.location(in: self)
         state.isHovering = true
         state.isTouching = false
-        state.tiltDegrees = 90 - recognizer.altitudeAngle.degrees
+        state.tiltDegrees = min(90 - recognizer.altitudeAngle.degrees, 70)
         state.barrelRollDegrees = PencilAngle.normalizedDegrees(recognizer.rollAngle.degrees)
 
         pencil?.state = state
@@ -147,7 +147,7 @@ extension PencilCaptureView: UIPencilInteractionDelegate {
         state.location = pose.location
         state.isHovering = true
         state.isTouching = false
-        state.tiltDegrees = 90 - pose.altitudeAngle.degrees
+        state.tiltDegrees = min(90 - pose.altitudeAngle.degrees, 70)
         state.barrelRollDegrees = PencilAngle.normalizedDegrees(pose.rollAngle.degrees)
     }
 }
