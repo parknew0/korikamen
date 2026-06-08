@@ -86,6 +86,9 @@ struct LockGaugeView: View {
                 isClear: isClear
             )
             .frame(width: 100, height: 150)
+            .overlay {      // 캔버스 안에만 펜슬 입력을 받게 하기 위해 이곳에 사용
+                RealPencilFeeder()
+            }
             .position(x: size.width * 0.275, y: size.height * 0.43)
         }
         .padding(20)
