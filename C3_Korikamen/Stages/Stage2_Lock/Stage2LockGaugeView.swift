@@ -113,7 +113,7 @@ struct LockGaugeView: View {
                     isSatisfied: tiltRangeSatisfied,        // 목표 Tilt 범위에 현재 tilt 값이 들어가있는가
                     targetLower: min(tiltRangeLower, tiltRangeUpper),
                     targetUpper: max(tiltRangeLower, tiltRangeUpper),
-                    gaugeRange: 0...90,     // Tilt 범위는 0도~90도
+                    gaugeRange: 0...70,     // Tilt 범위는 0도~70도
                     color: .stage2TiltPanel,
                     circleStrokeColor: .stage2TiltCircleStroke
                 )
