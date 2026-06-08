@@ -1,11 +1,11 @@
 {
   "images" : [
     {
-      "filename" : "img_stage3tutorial(btn_pressed)_papyrus.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
+      "filename" : "img_stage3tutorial(btn_pressed)_papyrus 1.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
