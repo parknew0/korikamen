@@ -22,6 +22,13 @@ enum SqueezePhase {
     case ended      // 손 뗌(해당 프레임 1회)
 }
 
+enum PencilAngle {            // Barrel Roll 각도 정규화
+    static func normalizedDegrees(_ value: Double) -> Double {
+        let degrees = value.truncatingRemainder(dividingBy: 360)
+        return degrees >= 0 ? degrees : degrees + 360       // 음수 각도 양수로 변환
+    }
+}
+
 /// 한 순간의 펜슬 상태. 게임 로직은 raw API가 아니라 이 값만 읽는다.
 /// (location/isTouching은 "펜슬" 접촉 기준 — Feeder가 손가락 터치는 걸러낸다.)
 struct PencilState {
@@ -34,20 +41,21 @@ struct PencilState {
     /// 화면 위에 떠서 호버 중인가.               [Stage1 조준]
     var isHovering: Bool = false
 
-    // MARK: - 압력 / 기울기 / 회전
-    /// 필압 0...1.                              [Stage1 드릴/끌 세기]
-    var pressure: Double = 0
+    // MARK: - 기울기 / 회전
     /// 기울기 0(수직)...90(수평) = 90 - altitude. [Stage2]
     /// ※ raw 값이다. 유효구간(예: 0~60) 적용은 스테이지의 게임 규칙.
     var tiltDegrees: Double = 0
     /// 배럴롤(rollAngle) 0...360.                [Stage2]
     var barrelRollDegrees: Double = 0
 
-    // MARK: - 스퀴즈 (Pencil Pro)
+    // MARK: - 더블 탭 / 스퀴즈 (Pencil Pro)
+    /// 더블 탭 카운트
+    var doubleTapCount: Int = 0
     /// 스퀴즈 단계.                              [Stage3-S2]
     var squeezePhase: SqueezePhase = .none
 
     // MARK: - 편의 헬퍼
     /// 스퀴즈를 "쥐고 있는 중"인지. (began/changed 동안 true)
     var isSqueezing: Bool { squeezePhase == .began || squeezePhase == .changed }
+
 }

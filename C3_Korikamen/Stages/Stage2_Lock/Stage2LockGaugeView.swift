@@ -119,8 +119,8 @@ struct LockGaugeView: View {
                     title: "돌리기",       // 어떤 게이지인지 나타내는 이름
                     value: pencil.state.barrelRollDegrees,      // Barrel Roll 현재 값
                     isSatisfied: rollRangeSatisfied,            // 목표 Barrel Roll 범위에 현재 Barrel Roll 값이 들어가있는가
-                    targetLower: NormalizedDegrees(rollRangeLower),
-                    targetUpper: NormalizedDegrees(rollRangeUpper),
+                    targetLower: PencilAngle.normalizedDegrees(rollRangeLower),
+                    targetUpper: PencilAngle.normalizedDegrees(rollRangeUpper),
                     gaugeRange: 0...360,        // Barrel Roll 범위는 0도~360도
                     color: .stage2BarrelRollPanel,
                     circleStrokeColor: .stage2BarrelRollCircleStroke
@@ -143,7 +143,7 @@ struct LockGaugeView: View {
     }
     
     private var rollRangeSatisfied: Bool {      // PencilRangeGauge에서 범위를 만족했는지 확인하는 용도로 사용(Barrel Roll)
-        CircularRangeContains(      // Barrel Roll 목표 범위에 현재 값이 있으면 true를 반환하는 함수
+        circularRangeContains(      // Barrel Roll 목표 범위에 현재 값이 있으면 true를 반환하는 함수
             value: pencil.state.barrelRollDegrees,
             lower: rollRangeLower,
             upper: rollRangeUpper
@@ -230,19 +230,11 @@ struct LockGaugeView: View {
     }
 }
 
-
-private func NormalizedDegrees(_ value: Double) -> Double {     // 정규화 - 360도 이상 각도를 360도 이하로 변환
-    // truncatingRemainder(Double type 나머지 구하는 방법) - 360으로 나눴을 때 나머지
-    let degrees = value.truncatingRemainder(dividingBy: 360)
-    // 나머지가 0 이상인가? - true면 그대로, 아니면 +360을 해서 return(음수 각도 양수로 변환)
-    return degrees >= 0 ? degrees : degrees + 360
-}
-
 // 정규화 : 400도, -90도 등 복잡한 숫자를 0~360도 사이로 각도 변환
-private func CircularRangeContains(value: Double, lower: Double, upper: Double) -> Bool {
-    let normalizedValue = NormalizedDegrees(value)      // 현재 각도 정규화
-    let normalizedLower = NormalizedDegrees(lower)      // 목표 범위 최솟값 정규화
-    let normalizedUpper = NormalizedDegrees(upper)      // 목표 범위 최댓값 정규화
+private func circularRangeContains(value: Double, lower: Double, upper: Double) -> Bool {
+    let normalizedValue = PencilAngle.normalizedDegrees(value)      // 현재 각도 정규화
+    let normalizedLower = PencilAngle.normalizedDegrees(lower)      // 목표 범위 최솟값 정규화
+    let normalizedUpper = PencilAngle.normalizedDegrees(upper)      // 목표 범위 최댓값 정규화
 
     if normalizedLower <= normalizedUpper {     // 범위 시작 각도 <= 범위 끝 각도(일반적 경우)
         // 범위 시작 각도 <= 현재 각도 <= 범위 끝 각도 ; 범위 사이에 있으면 true 반환

@@ -36,8 +36,13 @@ struct MockPencilFeeder: View {
             touchPad
             slider("tilt",  $pencil.state.tiltDegrees, 0...90, "°")
             slider("roll",  $pencil.state.barrelRollDegrees, 0...360, "°")
-            slider("press", $pencil.state.pressure, 0...1, "")
             Toggle("hover", isOn: $pencil.state.isHovering).font(.caption2)
+            Button {        // 더블 탭 테스트 버튼
+                pencil.state.doubleTapCount += 1
+            } label: {
+                Label("double tap", systemImage: "hand.tap")
+                    .font(.caption2)
+            }
             squeezeButton
         }
         .padding(10)
@@ -55,7 +60,7 @@ struct MockPencilFeeder: View {
                 if pencil.state.isTouching, let p = padPoint {
                     ZStack {
                         Circle().fill(.orange.opacity(0.5))
-                            .frame(width: 14 + pencil.state.pressure * 26)
+                            .frame(width: 22)
                         Rectangle().fill(.orange).frame(width: 2, height: 22)
                             .rotationEffect(.degrees(pencil.state.barrelRollDegrees))
                     }

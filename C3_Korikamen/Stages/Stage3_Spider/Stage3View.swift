@@ -230,6 +230,9 @@ struct Stage3View: View { // 맥스 바보
         .padding(.leading, -10)
         .onAppear { timer.start() }
         .onChange(of: timer.isTimeOver) { _, over in if over { TickSound.stop(); onFail() } } // 시간초과 실패 시 소리 정지
+        .overlay {
+            RealPencilFeeder()
+        }
 
         // MARK: - Scene#1 관련 기믹
         .onChange(of: pencil.state.isTouching){ _, touching in

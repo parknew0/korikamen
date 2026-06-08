@@ -44,6 +44,9 @@ struct Stage1View: View {
             
             SpriteView(scene: scene, options: [.allowsTransparency]) // spritekit 배경 투명하게 설정
                 .ignoresSafeArea()
+                .overlay {
+                    RealPencilFeeder()
+                }
 
             // 상단 HUD: 남은 시간 + 도구 전환
             VStack {
@@ -65,7 +68,7 @@ struct Stage1View: View {
         }
         .onAppear {
             scene.manager = manager
-            scene.pressureProvider = { let p = pencil.state.pressure; return p > 0 ? p : 0.5 }
+            scene.pressureProvider = { 1.0 }        // pressure 안써서 고정값으로 일단 넣어뒀어요
             applyTransform()   // 저장된(또는 기본) 위치·배율을 씬에 반영 — 릴리스 포함 항상
             timer.start()
         }

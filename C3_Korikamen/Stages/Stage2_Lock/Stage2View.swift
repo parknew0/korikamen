@@ -28,6 +28,9 @@ struct Stage2View: View {
                     timer.stop()
                     onClear()
                  }
+                .overlay {
+                    RealPencilFeeder()
+                }
                                 
             }
             .overlay(alignment: .top){ topHUD }
