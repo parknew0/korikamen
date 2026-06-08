@@ -169,11 +169,11 @@ struct Stage3View: View { // 맥스 바보
     private var topHUD: some View {
         HStack{
             // 좌측 상단 타이틀
-            Image("Stage3_Title")
+           /* Image("Stage3_Title")
                 .resizable()
                 .scaledToFit()
                 .frame(height: 60)
-
+            */
             Spacer()
 
             //우측 상단 타이머
