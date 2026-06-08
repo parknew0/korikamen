@@ -179,7 +179,7 @@ enum MoveLidSound {
 enum PumpSound {
     static var player: AVAudioPlayer?
     static func play() {
-        guard let url = Bundle.main.url(forResource: "airpump", withExtension: "m4a") else { return }
+        guard let url = Bundle.main.url(forResource: "air-pump", withExtension: "m4a") else { return }
         player = try? AVAudioPlayer(contentsOf: url)
         player?.play()
     }
