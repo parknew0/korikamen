@@ -17,6 +17,8 @@ struct Stage2View: View {
       ZStack {
             background
               .overlay(alignment: .bottomTrailing) { bottomButtons } // 우측 하단 테스트 버튼
+          //    .onAppear {Stage2BGM.play()}
+          // .onDisappear {Stage2BGM.stop()} // ← 메인 벗어나면 정지
           
             WarningBorderView(isWarning: isTimeWarning)     // 타임임박 시 붉은 효과
 
@@ -38,6 +40,7 @@ struct Stage2View: View {
 
             
         }
+
     }
     
     // 테스트에 사용하는 임시 버튼들

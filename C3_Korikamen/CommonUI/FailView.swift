@@ -14,7 +14,7 @@ struct FailView: View {
     let stage: Int               // 호출부 시그니처 유지용(현재 화면엔 미표시)
     let onRetry: () -> Void      // 다시 시작
     let onMain: () -> Void       // 시작(메인으로)
-
+    @State private var played = false //중복 재생 방지
     var body: some View {
         ZStack {
             Color.black.ignoresSafeArea()        // 검은 배경
@@ -42,6 +42,12 @@ struct FailView: View {
                 }
             }
             .padding()
+        }
+        .onAppear {
+            if !played {
+                GameOverBGM.play()
+                played = true
+            }
         }
     }
 }
