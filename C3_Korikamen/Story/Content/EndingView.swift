@@ -41,9 +41,12 @@ struct EndingView: View {
                             withAnimation(.easeInOut(duration: 0.9).repeatForever(autoreverses: true)){pulse = true}
                         }
                 }
+                .onAppear {MainBGM.play()}
+                .onDisappear {MainBGM.stop()} // ← 메인 벗어나면 정지
               
             }
         }
+       
     }
     private var playTimeBadge: some View {
         VStack(spacing: 8) {

@@ -181,6 +181,7 @@ struct Stage3View: View { // 맥스 바보
                          tint: .red,
                          normalImage: "Stage3Timer",
                          warningImage: "Stage3Timer")
+            .padding(.top, 30)
         }
         .padding(.horizontal, 30)
         .padding(.top, 20)
