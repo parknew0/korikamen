@@ -70,6 +70,9 @@ struct LockGaugeView: View {
                 applyCurrentLevel()
             }
         }
+        .onDisappear {
+            KeySound.stop()  // 스테이지 나갈 시, 음성 멈추도록
+        }
     }
     
     private func landscapeLayout(size: CGSize) -> some View {
@@ -158,10 +161,11 @@ struct LockGaugeView: View {
         guard isHoldingValidPose else {       // 레벨 클리어 조건을 하나라도 만족하지 못한 경우
             holdStartDate = nil         // 범위 안에 처음 들어온 시각 = nil
             holdDuration = 0        // 누적시간 = 0
+            KeySound.stop() // 조건 벗어날 시 정지
             isClear = false
             return
         }
-
+        KeySound.start() // 키 따기 시작할 시, 음성 나오도록
         if holdStartDate == nil {       // 범위 안에 들어온 적이 없는 경우
             holdStartDate = date
         }
