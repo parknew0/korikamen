@@ -71,5 +71,8 @@ struct MainView: View {
                 .scaledToFill()
                 .ignoresSafeArea()                     // 배경만 화면 끝까지 bleed
         )
+        .onAppear {MainBGM.play()}
+        .onDisappear {MainBGM.stop()} // ← 메인 벗어나면 정지
     }
 }
+
