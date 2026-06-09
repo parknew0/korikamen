@@ -19,11 +19,12 @@ private struct Stage2LockLevel {
 struct LockGaugeView: View {
     @EnvironmentObject private var pencil: PencilInput      // 펜슬 입력
     
+    @StateObject private var haptics = Haptics()    // 햅틱
+    
     @State private var tiltRangeLower = 35.0        // 목표 Tilt 범위(Lower)
     @State private var tiltRangeUpper = 55.0        // 목표 Tilt 범위(Upper)
     @State private var rollRangeLower = 160.0       // 목표 Barrel Roll 범위(Lower)
     @State private var rollRangeUpper = 200.0       // 목표 Barrel Roll 범위(Upper)
-    @State private var hapticFalloff = 100.0         // 햅틱 피드백을 줄 수 있는 범위(캔버스에 맞춰 수치 조정 필요)
     @State private var holdDuration = 0.0           // 유지시간
     @State private var lastHoldTick: Date?          // 바로 직전에 시간을 쟀던 과거의 타이머 시점
     @State private var isClear = false              // 클리어 여부
@@ -73,6 +74,8 @@ struct LockGaugeView: View {
         .onDisappear {
             KeySound.stop()  // 스테이지 나갈 시, 음성 멈추도록
         }
+        
+        .stageHaptics(haptics)
     }
     
     private func landscapeLayout(size: CGSize) -> some View {
@@ -166,6 +169,8 @@ struct LockGaugeView: View {
             return
         }
         KeySound.start() // 키 따기 시작할 시, 음성 나오도록
+        haptics.pulse()
+        
         if holdStartDate == nil {       // 범위 안에 들어온 적이 없는 경우
             holdStartDate = date
         }
