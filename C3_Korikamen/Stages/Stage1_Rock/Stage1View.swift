@@ -40,7 +40,6 @@ struct Stage1View: View {
                 .scaledToFill() //화면 꽉 채우기
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .ignoresSafeArea()
-            
             WarningBorderView(isWarning: isTimeWarning)
             
             SpriteView(scene: scene, options: [.allowsTransparency]) // spritekit 배경 투명하게 설정
