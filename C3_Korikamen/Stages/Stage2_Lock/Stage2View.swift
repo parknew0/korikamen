@@ -56,11 +56,11 @@ struct Stage2View: View {
     // 상단 HUD (좌측 타이틀 + 우측 타이머)
     private var topHUD: some View {
         HStack{
-            // 좌측 상단 타이틀
-            Image("Stage2_Title")
-                .resizable()
-                .scaledToFit()
-                .frame(height: 60)
+//            // 좌측 상단 타이틀
+//            Image("Stage2_Title")
+//                .resizable()
+//                .scaledToFit()
+//                .frame(height: 60)
 
             Spacer()
 
@@ -81,7 +81,7 @@ struct Stage2View: View {
     private var background: some View {
         Image("Stage2Background")
             .resizable()
-//            .scaledToFill() // 이상하게 이거 하면 화면이 확대되서 보여서 일단 주석처리
+//            .scaledToFill()
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .ignoresSafeArea()
     }

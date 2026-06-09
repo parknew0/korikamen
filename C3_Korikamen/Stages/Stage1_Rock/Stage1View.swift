@@ -37,7 +37,7 @@ struct Stage1View: View {
         ZStack {
             Image("Stage1Background") //배경 추가
                 .resizable()
-                .scaledToFill() //화면 꽉 채우기
+//                .scaledToFill() //화면 꽉 채우기
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .ignoresSafeArea()
             WarningBorderView(isWarning: isTimeWarning)

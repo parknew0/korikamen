@@ -19,24 +19,24 @@ struct FailView: View {
         ZStack {
             Color.black.ignoresSafeArea()        // 검은 배경
 
-            VStack(spacing: 40) {
+            VStack(spacing: 100) {
                 // 게임오버 큰 이미지
                 Image("gameover_gameover")
                     .resizable()
                     .scaledToFit()
-                    .frame(maxWidth: 600)        // 크기 상한 — 조절
+                    .frame(maxWidth: 500)        // 크기 상한 — 조절
 
                 // 다시시작 / 시작 버튼 (가로 정렬)
-                HStack(spacing: 30) {
+                HStack(spacing: 90) {
                     Button { onRetry() } label: {
                         Image("gameover_retry_normal")
-                            .resizable().scaledToFit().frame(width: 220)
+                            .resizable().scaledToFit().frame(width: 150)
                     }
                     .buttonStyle(.plain)
 
                     Button { onMain() } label: {
                         Image("gameover_start_normal")
-                            .resizable().scaledToFit().frame(width: 220)
+                            .resizable().scaledToFit().frame(width: 150)
                     }
                     .buttonStyle(.plain)
                 }

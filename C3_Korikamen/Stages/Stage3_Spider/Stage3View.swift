@@ -65,7 +65,7 @@ struct Stage3View: View { // 맥스 바보
     private var background: some View {
         Image("Stage3Background")
             .resizable()
-            .scaledToFill() //화면 맞추기
+//            .scaledToFill() //화면 맞추기
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .ignoresSafeArea()
     }

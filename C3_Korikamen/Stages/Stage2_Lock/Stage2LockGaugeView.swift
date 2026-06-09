@@ -81,36 +81,45 @@ struct LockGaugeView: View {
     private func landscapeLayout(size: CGSize) -> some View {
         _ = min(size.width * 0.48, 520)
         
-        return HStack(alignment: .top, spacing: 18) {
-            gaugePanel      // 목표와 현재 Tilt/Barrel Roll값 확인 가능한 패널
-            
-            // 실제 펜슬을 접촉시키는 캔버스
-            Stage2LockCanvasView(
-                state: pencil.state,
-                holdDuration: holdDuration,
-                holdGoal: holdGoal,
-                isClear: isClear
-            )
-            .frame(width: 100, height: 150)
-            .overlay {      // 캔버스 안에만 펜슬 입력을 받게 하기 위해 이곳에 사용
-                RealPencilFeeder()
+        return ZStack {
+            VStack (spacing: 90) {
+                // 클리어한 레벨 시각화
+                HStack(spacing: 20) {
+                    ForEach(0..<max(levels.count, 3), id: \.self) { index in
+                        Circle()
+                            .fill(index < clearedLevelCount ? .green : .stage2PanelBackground.opacity(0.4))
+                            .frame(width: 40, height: 40)
+                    }
+                }
+                .padding(.leading, 45)      // 패드 전체의 중앙보다, 자물쇠의 중앙과 일치하도록 사용
+                
+                Spacer()
             }
-            .position(x: size.width * 0.275, y: size.height * 0.43)
+            
+            HStack(alignment: .top, spacing: 18) {
+                gaugePanel      // 목표와 현재 Tilt/Barrel Roll값 확인 가능한 패널
+                
+                // 실제 펜슬을 접촉시키는 캔버스
+                Stage2LockCanvasView(
+                    state: pencil.state,
+                    holdDuration: holdDuration,
+                    holdGoal: holdGoal,
+                    isClear: isClear
+                )
+                .frame(width: 100, height: 150)
+                .overlay {      // 캔버스 안에만 펜슬 입력을 받게 하기 위해 이곳에 사용
+                    RealPencilFeeder()
+                }
+                .position(x: size.width * 0.275, y: size.height * 0.43)
+            }
+            .padding(20)
+            
         }
-        .padding(20)
     }
     
     private var gaugePanel: some View {     // 목표와 현재 Tilt/Barrel Roll값 확인 가능한 패널
         VStack(alignment: .center, spacing: 20) {
-            Spacer()        // 타이틀에 시각화가 너무 가까이 있어 사용
-            // 클리어한 레벨 시각화
-            HStack(spacing: 10) {
-                ForEach(0..<max(levels.count, 3), id: \.self) { index in
-                    Circle()
-                        .fill(index < clearedLevelCount ? .green : .stage2PanelBackground.opacity(0.4))
-                        .frame(width: 25, height: 25)
-                }
-            }
+            Spacer()        // 타이틀에 게이지가 너무 가까이 있어 사용
             
             VStack(spacing: 20) {       // Tilt, Barrel Roll 원형 게이지
                 Stage2PencilRangeGauge(
