@@ -10,7 +10,9 @@ import SwiftUI
 struct MainView: View {
     let onStart: () -> Void
     @State private var showTutorial = false
-
+    @State private var hasShownTutorial = false //최초 1회 판단
+    @State private var startAfterTutorial = false // 닫으면 게임 시작될 지 여부
+    
     var body: some View {
         ZStack {
             // 타이틀 — 상단 중앙
@@ -25,7 +27,12 @@ struct MainView: View {
             // 시작 버튼 — 하단 중앙
             VStack {
                 Spacer()
-                Button { onStart() } label: {
+                Button { if hasShownTutorial {onStart()
+                } else {startAfterTutorial = true
+                    withAnimation { showTutorial = true } //최초 1회 튜토리얼
+                }
+                    
+                } label: {
                     Image("btn_start_middledown_square_gold")
                         .resizable().scaledToFit().frame(width: 150)
                 }
@@ -37,7 +44,9 @@ struct MainView: View {
             VStack {
                 HStack {
                     // 변경 후: clear 리퀴드 글라스 원 위에 물음표
-                    Button { withAnimation { showTutorial = true } } label: {
+                    Button {
+                        startAfterTutorial = false // 도움말로 연건 닫아도 시작 안되도록
+                        withAnimation { showTutorial = true } } label: {
                         Image(systemName: "questionmark")
                             .font(.system(size: 26, weight: .bold))
                             .foregroundStyle(.white)
@@ -59,7 +68,13 @@ struct MainView: View {
                     Image("tutorial").resizable().scaledToFit().padding(40)
                 }
                 .contentShape(Rectangle())
-                .onTapGesture { withAnimation { showTutorial = false } }
+                .onTapGesture { withAnimation { showTutorial = false }
+                    hasShownTutorial = true
+                    if startAfterTutorial {
+                        startAfterTutorial = false
+                        onStart()
+                    } //시작 버튼으로 연 경우만 게임이 시작되도록
+                }
                 .transition(.opacity)
                 .zIndex(1)
             }
