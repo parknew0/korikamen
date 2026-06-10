@@ -261,7 +261,6 @@ struct Stage3View: View { // 맥스 바보
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { //0.3초에 걸쳐 부드럽게 어두워 지도록
                 withAnimation(.easeOut(duration: 0.5)) {fadeOpacity = 0} //0.5초에 걸쳐 다시 밝아지도록
             }
-
         }
 
 
