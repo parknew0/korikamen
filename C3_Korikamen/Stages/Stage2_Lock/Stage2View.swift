@@ -12,7 +12,7 @@ struct Stage2View: View {
     let onClear: () -> Void
     let onFail: () -> Void
     @EnvironmentObject private var game: GameManager
-    @StateObject private var timer = CountdownTimer(duration: 90)   // 1분 30초로 수정
+    @StateObject private var timer = CountdownTimer(duration: 60)   // 1분 30초로 수정
 
     var body: some View {
       ZStack {

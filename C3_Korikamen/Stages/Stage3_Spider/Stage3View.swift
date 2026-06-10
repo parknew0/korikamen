@@ -12,7 +12,7 @@ struct Stage3View: View { // 맥스 바보
     let onClear: () -> Void
     let onFail: () -> Void
 
-    @StateObject private var timer = CountdownTimer(duration: 90)    // 90초 (기획값)
+    @StateObject private var timer = CountdownTimer(duration: 40)    // 90초 (기획값)
     @EnvironmentObject private var pencil: PencilInput // 펜슬 입력
     @EnvironmentObject private var game: GameManager // 추가
     @StateObject private var manager = Stage3GameManager() // 로직 클래스 불러오기
