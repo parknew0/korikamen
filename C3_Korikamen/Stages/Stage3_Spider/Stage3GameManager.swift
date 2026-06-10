@@ -35,7 +35,8 @@ final class Stage3GameManager: ObservableObject {
     private var cancellable : AnyCancellable? //Combine 타이머를 담기 위함
     
     //계산되는 값
-    var isInTarget : Bool { gauge >= targetMin && gauge <= targetMax } // 게이지가 현재 목표 범위 안에 있는지 여부
+    private let tolerance = 0.03 //판정 여유
+    var isInTarget : Bool { gauge >= targetMin && gauge <= targetMax + tolerance} // 게이지가 현재 목표 범위 안에 있는지 여부 + 판정 완화(max 범위만 후하게 처리) 
     var isCleared : Bool { successCount >= requiredSuccessCount } // 클리어 여부
     
     // MARK: - 함수들
