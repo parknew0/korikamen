@@ -137,12 +137,13 @@ struct Stage1View: View {
             ZStack {
                 Circle()
                     .fill(.clear)
-                    .glassEffect(.clear, in: Circle())
-                    .opacity(0.75)                 // ← 배경만 더 투명하게 (아이콘 영향 X)
+                    .glassEffect(.clear.tint(.stage2PanelBackground.opacity(0.8)))  // 살짝 뿌옇게
+//                    .glassEffect(.clear, in: Circle())
+//                    .opacity(0.75)                 // ← 배경만 더 투명하게 (아이콘 영향 X)
                 Image(manager.tool == .drill ? "drill" : "chisel")
                     .resizable()
                     .scaledToFit()
-                    .padding(28)
+                    .padding(15)
             }
             .frame(width: 120, height: 120)
         }

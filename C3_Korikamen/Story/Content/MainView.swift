@@ -42,7 +42,7 @@ struct MainView: View {
                             .font(.system(size: 26, weight: .bold))
                             .foregroundStyle(.white)
                             .frame(width: 60, height: 60)
-                            .glassEffect(.clear.tint(.white.opacity(0.12)), in: Circle())  // 살짝 뿌옇게
+                            .glassEffect(.clear.tint(.stage2PanelBackground.opacity(0.8)), in: Circle())  // 살짝 뿌옇게
                             .contentShape(Circle())          // ← 원 전체가 터치 영역
                     }
                     .buttonStyle(.plain)
