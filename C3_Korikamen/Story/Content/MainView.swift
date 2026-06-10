@@ -59,7 +59,7 @@ struct MainView: View {
                 }
                 Spacer()
             }
-            .padding(20)
+            .padding(25)
 
             // 튜토리얼 모달
             if showTutorial {

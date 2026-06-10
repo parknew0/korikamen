@@ -17,25 +17,25 @@ struct Stage2LockCanvasView: View {        // 실제 펜슬을 접촉시키는 �
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                Canvas { context, size in
-
-                    var path = Path()
-                    let spacing: CGFloat = 48
-                    
-                    // 격자무늬 - 추후 삭제 예정
-                    stride(from: CGFloat(0), through: size.width, by: spacing).forEach { x in
-                        path.move(to: CGPoint(x: x, y: 0))
-                        path.addLine(to: CGPoint(x: x, y: size.height))
-                    }
-
-                    stride(from: CGFloat(0), through: size.height, by: spacing).forEach { y in
-                        path.move(to: CGPoint(x: 0, y: y))
-                        path.addLine(to: CGPoint(x: size.width, y: y))
-                    }
-
-                    context.stroke(path, with: .color(.secondary.opacity(0.22)), lineWidth: 1)
-                }
-                .border(.cyan)
+//                Canvas { context, size in
+//
+//                    var path = Path()
+//                    let spacing: CGFloat = 48
+//                    
+//                    // 격자무늬 - 추후 삭제 예정
+//                    stride(from: CGFloat(0), through: size.width, by: spacing).forEach { x in
+//                        path.move(to: CGPoint(x: x, y: 0))
+//                        path.addLine(to: CGPoint(x: x, y: size.height))
+//                    }
+//
+//                    stride(from: CGFloat(0), through: size.height, by: spacing).forEach { y in
+//                        path.move(to: CGPoint(x: 0, y: y))
+//                        path.addLine(to: CGPoint(x: size.width, y: y))
+//                    }
+//
+//                    context.stroke(path, with: .color(.secondary.opacity(0.22)), lineWidth: 1)
+//                }
+//                .border(.cyan)
 
                 // 프로그레스바로 유지시간 시각화
                 if let location = state.location {
