@@ -167,3 +167,30 @@ func topRanks(limit: Int = 20) async throws -> [Rank] {
 - **백업**: 기록은 `server/data/scores.db` 파일 하나. 가끔 `scp` 로 받아 두면 끝.
 - **업데이트**: 코드 변경 후 `git pull && docker compose up -d --build`.
 - **나중에 HTTPS로**: 무료 도메인(DuckDNS) + Let's Encrypt + nginx 를 붙이면 ATS 예외를 끄고 정식 HTTPS로 갈 수 있다. 그때도 앱은 §5-2의 `baseURL` 한 줄만 바꾸면 된다.
+
+---
+
+## 7. GitHub Actions 자동 배포 (선택)
+
+`main` 의 `server/` 가 바뀌면 OCI 서버에 자동으로 재배포된다(`.github/workflows/deploy-ranking.yml`).
+동작: 체크아웃 → `server/` 를 서버 `~/korikamen-ranking` 로 복사 → 그 폴더에서 `docker compose up -d --build`.
+
+### 넣어야 할 GitHub Secrets
+레포 → **Settings → Secrets and variables → Actions → New repository secret**
+
+| 이름 | 값 | 필수 |
+| --- | --- | --- |
+| `OCI_SSH_HOST` | 서버 공인 IP | ✅ |
+| `OCI_SSH_USER` | `ubuntu`(Ubuntu) 또는 `opc`(Oracle Linux) | ✅ |
+| `OCI_SSH_KEY` | SSH **개인키 전체** (`-----BEGIN ... -----END ...`) | ✅ |
+| `OCI_SSH_PORT` | SSH 포트 (기본 22면 **생략 가능**) | ⬜ |
+| `RANKING_API_KEY` | 점수 위조 방지 키 (쓸 때만) | ⬜ |
+
+> ⚠️ IP·포트는 비밀이 아니지만, **`OCI_SSH_KEY`(SSH 개인키)는 진짜 비밀**이다. 절대 코드/커밋에 넣지 말고 Secret 으로만 둔다.
+
+### 서버 사전 준비 (최초 1회)
+- Docker / docker compose 설치, 배포 사용자가 docker 그룹에 포함: `sudo usermod -aG docker $USER` 후 재로그인 (sudo 없이 `docker` 실행되게).
+- Actions 가 쓸 SSH **공개키**를 서버 `~/.ssh/authorized_keys` 에 등록. 그 짝인 **개인키**를 `OCI_SSH_KEY` Secret 에 넣는다. (인스턴스 만들 때 쓴 키를 재사용해도 되지만, CI 전용 키페어를 새로 만드는 편이 더 안전)
+- 방화벽 2겹에 포트 개방 (§4-3).
+
+> 처음엔 Actions 탭에서 **Run workflow**(수동 실행)로 한 번 돌려 SSH·배포가 되는지 확인한 뒤, 이후 push 자동 배포를 쓰면 된다.

@@ -1,0 +1,51 @@
+name: Deploy Ranking Server
+
+# main 의 server/ 가 바뀌면 OCI 서버에 자동 배포한다.
+# 수동 실행도 가능: 레포 → Actions 탭 → 이 워크플로 → Run workflow.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "server/**"
+      - ".github/workflows/deploy-ranking.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-ranking
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 체크아웃
+        uses: actions/checkout@v4
+
+      # server/ 폴더를 서버의 ~/korikamen-ranking 로 복사 (strip_components 로 server/ 접두 제거)
+      - name: 서버로 파일 복사 (scp)
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.OCI_SSH_HOST }}
+          username: ${{ secrets.OCI_SSH_USER }}
+          key: ${{ secrets.OCI_SSH_KEY }}
+          port: ${{ secrets.OCI_SSH_PORT || '22' }}
+          source: "server/"
+          target: "~/korikamen-ranking"
+          strip_components: 1
+
+      # 복사된 폴더에서 컨테이너 재빌드·기동. DB(data/)는 복사 대상이 아니라 보존된다.
+      - name: 배포 (docker compose)
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.OCI_SSH_HOST }}
+          username: ${{ secrets.OCI_SSH_USER }}
+          key: ${{ secrets.OCI_SSH_KEY }}
+          port: ${{ secrets.OCI_SSH_PORT || '22' }}
+          script: |
+            cd ~/korikamen-ranking
+            printf 'API_KEY=%s\n' '${{ secrets.RANKING_API_KEY }}' > .env
+            docker compose up -d --build
+            docker compose ps
