@@ -16,6 +16,8 @@
 | `POST` | `/scores` | 기록 저장. body: `{"nickname": "홍길동", "timeMs": 73210}` |
 | `GET`  | `/scores?limit=20` | `time_ms` 오름차순(빠른 순) 랭킹 반환 |
 | `GET`  | `/health` | 헬스 체크 |
+| `DELETE` | `/scores` | 기록 1건 삭제. body: `{"nickname":"홍길동","timeMs":73210}` (닉네임+ms 일치 항목 **모두**) |
+| `DELETE` | `/scores/all` | **모든 기록** 삭제 |
 
 - `nickname`: 1~12자(앞뒤 공백 제거). `timeMs`: 1 ~ 86,400,000(24시간) 범위만 허용 → 비정상 기록 차단.
 - 자동 문서: 서버 띄운 뒤 `http://<IP>:8080/docs` 에서 바로 테스트 가능.
@@ -29,8 +31,23 @@
 ]
 ```
 
-> **점수 위조 방지(선택)**: `.env` 에 `API_KEY` 를 넣으면 `POST /scores` 에 `X-API-Key` 헤더가 필요해진다.
-> 인증 없는 공개 POST 는 누구나 가짜 점수를 넣을 수 있으니, 내부 테스트라도 가벼운 키 하나 두는 걸 권장.
+> **점수 위조 방지(선택)**: `.env` 의 `API_KEY` 를 넣으면 `POST /scores` 에 `X-API-Key` 헤더가 필요해진다.
+> **삭제 보호**: 삭제는 `ADMIN_KEY` 로 **따로** 보호한다(설정 시 `DELETE` 에 `X-Admin-Key` 필요). POST 용 키와 분리돼 있어 **삭제 키를 켜도 이미 배포된 앱의 기록(POST)은 영향받지 않는다.** 삭제를 쓸 거면 `ADMIN_KEY` 설정을 권장.
+
+### 기록 삭제 (관리용)
+브라우저 `/docs` 의 **Try it out** 또는 curl 로:
+```bash
+# 1건 삭제 — 리더보드 JSON 의 nickname·timeMs 를 그대로 넣는다 (둘 다 일치하는 항목 모두 삭제)
+curl -X DELETE http://140.245.64.70:8081/scores \
+  -H 'content-type: application/json' \
+  -d '{"nickname":"테스트","timeMs":73210}'
+
+# 전부 삭제
+curl -X DELETE http://140.245.64.70:8081/scores/all
+
+# ADMIN_KEY 를 켰다면 두 요청 모두 -H 'X-Admin-Key: 키값' 을 추가
+```
+응답은 `{"deleted": 삭제된_건수}`. ⚠️ 삭제는 되돌릴 수 없고, 공개 서버이므로 `API_KEY` 보호를 권장(특히 `/scores/all`).
 
 ---
 
@@ -185,6 +202,7 @@ Actions 탭에서 **Run workflow** 를 누르면 OCI 서버에 배포된다(`.gi
 | `OCI_SSH_KEY` | SSH **개인키 전체** (`-----BEGIN ... -----END ...`) | ✅ |
 | `OCI_SSH_PORT` | SSH 포트 (기본 22면 **생략 가능**) | ⬜ |
 | `RANKING_API_KEY` | 점수 위조 방지 키 (쓸 때만) | ⬜ |
+| `RANKING_ADMIN_KEY` | 삭제(DELETE) 보호 키 (쓸 때만) | ⬜ |
 
 > ⚠️ IP·포트는 비밀이 아니지만, **`OCI_SSH_KEY`(SSH 개인키)는 진짜 비밀**이다. 절대 코드/커밋에 넣지 말고 Secret 으로만 둔다.
 

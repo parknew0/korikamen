@@ -41,6 +41,6 @@ jobs:
           port: ${{ secrets.OCI_SSH_PORT || '22' }}
           script: |
             cd ~/korikamen-ranking
-            printf 'API_KEY=%s\n' '${{ secrets.RANKING_API_KEY }}' > .env
+            printf 'API_KEY=%s\nADMIN_KEY=%s\n' '${{ secrets.RANKING_API_KEY }}' '${{ secrets.RANKING_ADMIN_KEY }}' > .env
             docker compose up -d --build
             docker compose ps

@@ -9,6 +9,7 @@ from pydantic import BaseModel, Field
 # 환경 변수로 운영 값 주입 (Docker / .env 에서 설정)
 DB_PATH = os.environ.get("DB_PATH", "scores.db")
 API_KEY = os.environ.get("API_KEY") or None        # 설정 시 POST 에 X-API-Key 헤더 요구
+ADMIN_KEY = os.environ.get("ADMIN_KEY") or None    # 설정 시 DELETE 에 X-Admin-Key 헤더 요구 (앱 POST 와 무관)
 MAX_TIME_MS = 24 * 60 * 60 * 1000                  # 24시간 초과 기록은 비정상으로 보고 차단
 
 
@@ -71,6 +72,12 @@ def require_api_key(x_api_key: str | None = Header(default=None)) -> None:
         raise HTTPException(status_code=401, detail="invalid api key")
 
 
+def require_admin_key(x_admin_key: str | None = Header(default=None)) -> None:
+    # 삭제 전용. POST 용 API_KEY 와 분리되어 있어, 이 키를 켜도 앱의 기록 전송에는 영향이 없다.
+    if ADMIN_KEY and x_admin_key != ADMIN_KEY:
+        raise HTTPException(status_code=401, detail="invalid admin key")
+
+
 @app.get("/health")
 def health():
     return {"status": "ok"}
@@ -104,3 +111,26 @@ def list_scores(limit: int = 20):
         ScoreOut(rank=i + 1, nickname=row["nickname"], timeMs=row["time_ms"])
         for i, row in enumerate(rows)
     ]
+
+
+@app.delete("/scores", dependencies=[Depends(require_admin_key)])
+def delete_score(score: ScoreIn):
+    """닉네임과 기록(ms)이 모두 일치하는 기록을 삭제한다.
+    ID 가 없으므로 (nickname, time_ms) 로 식별한다. 우연히 동일한 값이 여러 개면 모두 삭제된다."""
+    nickname = score.nickname.strip()
+    with get_db() as conn:
+        cur = conn.execute(
+            "DELETE FROM scores WHERE nickname = ? AND time_ms = ?",
+            (nickname, score.timeMs),
+        )
+        deleted = cur.rowcount
+    return {"deleted": deleted}
+
+
+@app.delete("/scores/all", dependencies=[Depends(require_admin_key)])
+def delete_all_scores():
+    """모든 기록을 삭제한다."""
+    with get_db() as conn:
+        cur = conn.execute("DELETE FROM scores")
+        deleted = cur.rowcount
+    return {"deleted": deleted}
