@@ -37,8 +37,8 @@
 
 | 이름 | 역할 | 담당 |
 | --- | --- | --- |
-| **노튼** | PM, Developer | 전반적인 프로젝트 운영 및 관리 , 스테이지 3 (거미줄 제거 · Squeeze/Drag) |
-| **맥스** | Developer | 스테이지 1 (돌 부수기 · Pressure/Hover) |
+| **노튼** | PM, Developer | 프로젝트 운영 및 관리 , 스테이지 3 (거미줄 제거 · Squeeze/Drag) |
+| **맥스** |  Developer | 스테이지 1 (돌 부수기 · Pressure/Hover) |
 | **실라** | Developer | 스테이지 2 (자물쇠 따기 · Tilt/Barrel Roll) |
 | **코리** | Designer | UI 디자인 (공통 뷰·HUD·화면 흐름) |
 | **캇** | Designer | 3D 에셋 디자인 (관·유물 모델링, 비주얼) |
