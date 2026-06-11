@@ -17,7 +17,9 @@ struct Stage2View: View {
     var body: some View {
       ZStack {
             background
-              .overlay(alignment: .bottomTrailing) { bottomButtons } // 우측 하단 테스트 버튼
+          #if DEBUG
+              .overlay(alignment: .bottomTrailing) { bottomButtons } // 우측 하단
+          #endif
           //    .onAppear {Stage2BGM.play()}
           // .onDisappear {Stage2BGM.stop()} // ← 메인 벗어나면 정지
           
@@ -44,7 +46,7 @@ struct Stage2View: View {
         }
 
     }
-    
+    #if DEBUG
     // 테스트에 사용하는 임시 버튼들
     private var bottomButtons: some View {
         Group {
@@ -54,6 +56,7 @@ struct Stage2View: View {
             }
         }
     }
+    #endif
     
     // 상단 HUD (좌측 타이틀 + 우측 타이머)
     private var topHUD: some View {
