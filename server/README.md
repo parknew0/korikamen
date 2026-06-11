@@ -202,6 +202,7 @@ Actions 탭에서 **Run workflow** 를 누르면 OCI 서버에 배포된다(`.gi
 | `OCI_SSH_KEY` | SSH **개인키 전체** (`-----BEGIN ... -----END ...`) | ✅ |
 | `OCI_SSH_PORT` | SSH 포트 (기본 22면 **생략 가능**) | ⬜ |
 | `RANKING_API_KEY` | 점수 위조 방지 키 (쓸 때만) | ⬜ |
+| `RANKING_ADMIN_KEY` | 삭제(DELETE) 보호 키 (쓸 때만) | ⬜ |
 
 > ⚠️ IP·포트는 비밀이 아니지만, **`OCI_SSH_KEY`(SSH 개인키)는 진짜 비밀**이다. 절대 코드/커밋에 넣지 말고 Secret 으로만 둔다.
 
