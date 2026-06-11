@@ -104,3 +104,26 @@ def list_scores(limit: int = 20):
         ScoreOut(rank=i + 1, nickname=row["nickname"], timeMs=row["time_ms"])
         for i, row in enumerate(rows)
     ]
+
+
+@app.delete("/scores", dependencies=[Depends(require_api_key)])
+def delete_score(score: ScoreIn):
+    """닉네임과 기록(ms)이 모두 일치하는 기록을 삭제한다.
+    ID 가 없으므로 (nickname, time_ms) 로 식별한다. 우연히 동일한 값이 여러 개면 모두 삭제된다."""
+    nickname = score.nickname.strip()
+    with get_db() as conn:
+        cur = conn.execute(
+            "DELETE FROM scores WHERE nickname = ? AND time_ms = ?",
+            (nickname, score.timeMs),
+        )
+        deleted = cur.rowcount
+    return {"deleted": deleted}
+
+
+@app.delete("/scores/all", dependencies=[Depends(require_api_key)])
+def delete_all_scores():
+    """모든 기록을 삭제한다."""
+    with get_db() as conn:
+        cur = conn.execute("DELETE FROM scores")
+        deleted = cur.rowcount
+    return {"deleted": deleted}

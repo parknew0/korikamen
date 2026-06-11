@@ -16,6 +16,8 @@
 | `POST` | `/scores` | 기록 저장. body: `{"nickname": "홍길동", "timeMs": 73210}` |
 | `GET`  | `/scores?limit=20` | `time_ms` 오름차순(빠른 순) 랭킹 반환 |
 | `GET`  | `/health` | 헬스 체크 |
+| `DELETE` | `/scores` | 기록 1건 삭제. body: `{"nickname":"홍길동","timeMs":73210}` (닉네임+ms 일치 항목 **모두**) |
+| `DELETE` | `/scores/all` | **모든 기록** 삭제 |
 
 - `nickname`: 1~12자(앞뒤 공백 제거). `timeMs`: 1 ~ 86,400,000(24시간) 범위만 허용 → 비정상 기록 차단.
 - 자동 문서: 서버 띄운 뒤 `http://<IP>:8080/docs` 에서 바로 테스트 가능.
@@ -29,8 +31,23 @@
 ]
 ```
 
-> **점수 위조 방지(선택)**: `.env` 에 `API_KEY` 를 넣으면 `POST /scores` 에 `X-API-Key` 헤더가 필요해진다.
-> 인증 없는 공개 POST 는 누구나 가짜 점수를 넣을 수 있으니, 내부 테스트라도 가벼운 키 하나 두는 걸 권장.
+> **점수 위조 방지·삭제 보호(선택이지만 삭제 쓰면 권장)**: `.env` 에 `API_KEY` 를 넣으면 `POST`·`DELETE` 에 `X-API-Key` 헤더가 필요해진다.
+> 인증 없는 공개 POST/DELETE 는 누구나 점수를 넣거나 **지울 수** 있으니, 삭제 기능을 쓸 거면 키를 꼭 설정하자.
+
+### 기록 삭제 (관리용)
+브라우저 `/docs` 의 **Try it out** 또는 curl 로:
+```bash
+# 1건 삭제 — 리더보드 JSON 의 nickname·timeMs 를 그대로 넣는다 (둘 다 일치하는 항목 모두 삭제)
+curl -X DELETE http://140.245.64.70:8081/scores \
+  -H 'content-type: application/json' \
+  -d '{"nickname":"테스트","timeMs":73210}'
+
+# 전부 삭제
+curl -X DELETE http://140.245.64.70:8081/scores/all
+
+# API_KEY 를 켰다면 두 요청 모두 -H 'X-API-Key: 키값' 을 추가
+```
+응답은 `{"deleted": 삭제된_건수}`. ⚠️ 삭제는 되돌릴 수 없고, 공개 서버이므로 `API_KEY` 보호를 권장(특히 `/scores/all`).
 
 ---
 
