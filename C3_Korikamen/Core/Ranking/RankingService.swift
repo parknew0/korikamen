@@ -12,8 +12,8 @@ import Foundation
 // MARK: - 서버 설정 (주소는 이 한 곳에서만 관리)
 
 enum RankingConfig {
-    /// 랭킹 서버 주소. HTTPS 준비되면 https://kandu.kr, 평문 포트로 노출하면 http://kandu.kr:8081.
-    static let baseURL = URL(string: "https://kandu.kr")!
+    /// 랭킹 서버 주소. 현재 OCI 평문 HTTP(생 IP:포트). HTTPS(nginx+인증서) 붙이면 https://kandu.kr 로 교체.
+    static let baseURL = URL(string: "http://140.245.64.70:8081")!
 
     /// 점수 위조 방지 키. 서버 .env 의 API_KEY 와 같은 값. 안 쓰면 nil.
     static let apiKey: String? = nil
