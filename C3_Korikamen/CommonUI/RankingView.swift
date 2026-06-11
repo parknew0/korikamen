@@ -13,6 +13,7 @@ struct RankingView: View {
 
     var body: some View {
         ZStack {
+            Color.black.ignoresSafeArea()                       // 바닥: fullScreenCover 흰 배경 노출 방지
             Image("bg_start")
                 .resizable().scaledToFill().ignoresSafeArea()
             Color.black.opacity(0.5).ignoresSafeArea()
@@ -53,6 +54,7 @@ struct RankingView: View {
             }
             .padding(.top, 24)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)       // 화면 전체를 채워 흰 배경이 비치지 않게
         .task { await store.load() }
     }
 
