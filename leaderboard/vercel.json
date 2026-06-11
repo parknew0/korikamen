@@ -1,0 +1,5 @@
+{
+  "rewrites": [
+    { "source": "/api/scores", "destination": "http://140.245.64.70:8081/scores" }
+  ]
+}

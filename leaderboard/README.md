@@ -4,7 +4,7 @@
 웹 배포가 아니라 **현장 노트북/PC에서 로컬로 하루 띄워 쓰는** 용도.
 
 - `index.html` — 리더보드 화면 (포디움 + 순위 리스트, 5초마다 갱신)
-- `leaderboard_background.png` — (선택) 배경 이미지. 같은 폴더에 두면 배경으로 깔린다. 없으면 어두운 단색.
+- `start.png` — 배경 이미지. 같은 폴더에 두면 배경으로 깔린다. 없으면 어두운 단색.
 
 ---
 
@@ -43,6 +43,33 @@ python3 -m http.server 8000
 ### 전체화면 / 키오스크
 - 일반: 브라우저 **F11**.
 - 완전 키오스크(주소창 없이): 예) `chrome --kiosk "http://localhost:8000"`
+
+---
+
+## 웹 배포 (Vercel — 아무나 URL 로 접속)
+
+로컬 대신 인터넷에 띄워 누구나 보게 하려면 Vercel 이 빠르다(무료·HTTPS·CDN).
+
+⚠️ **Mixed Content 처리**: Vercel 은 HTTPS 인데 서버는 HTTP(평문) 라, HTTPS 페이지가 HTTP API 를 직접 부르면 브라우저가 막는다. 그래서 `vercel.json` 으로 **Vercel 이 서버를 대신 호출(프록시)** 하게 했고(`/api/scores` → 서버), `index.html` 은 배포 환경에서 자동으로 그 프록시를 쓴다. (브라우저는 같은 HTTPS 도메인만 보므로 차단 없음)
+
+### 방법 1 — GitHub 연결 (자동 배포, Node 불필요)
+1. vercel.com 에 GitHub 계정으로 가입
+2. **New Project → `korikamen` 레포 import**
+3. **Root Directory 를 `leaderboard` 로 지정** (모노레포라 필수)
+4. Deploy → `https://<프로젝트>.vercel.app` 발급
+5. 이후 `leaderboard/` 를 push 하면 자동 재배포
+> 이 방식은 **`start.png` 도 git 에 올라가 있어야** 배경이 나온다: `git add leaderboard/start.png && git commit && git push`
+
+### 방법 2 — CLI (로컬 폴더째 업로드)
+```bash
+npm i -g vercel        # Node 필요
+cd leaderboard
+vercel                 # 브라우저 로그인 후 질문 엔터 → 미리보기 배포
+vercel --prod          # 정식 URL
+```
+로컬 `leaderboard/` 를 그대로 올리므로 `start.png` 가 폴더에 있으면 같이 올라간다.
+
+배포된 URL 을 큰 화면 브라우저에서 열고 F11 → 끝. 갱신·정렬은 그대로 동작한다.
 
 ---
 
