@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Combine
 
 @MainActor
 final class RankingStore: ObservableObject {
@@ -16,7 +17,7 @@ final class RankingStore: ObservableObject {
 
     private let service: RankingService
 
-    init(service: RankingService = RemoteRankingService()) {
+    nonisolated init(service: RankingService = RemoteRankingService()) {
         self.service = service
     }
 
