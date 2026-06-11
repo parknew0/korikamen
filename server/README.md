@@ -31,8 +31,8 @@
 ]
 ```
 
-> **점수 위조 방지·삭제 보호(선택이지만 삭제 쓰면 권장)**: `.env` 에 `API_KEY` 를 넣으면 `POST`·`DELETE` 에 `X-API-Key` 헤더가 필요해진다.
-> 인증 없는 공개 POST/DELETE 는 누구나 점수를 넣거나 **지울 수** 있으니, 삭제 기능을 쓸 거면 키를 꼭 설정하자.
+> **점수 위조 방지(선택)**: `.env` 의 `API_KEY` 를 넣으면 `POST /scores` 에 `X-API-Key` 헤더가 필요해진다.
+> **삭제 보호**: 삭제는 `ADMIN_KEY` 로 **따로** 보호한다(설정 시 `DELETE` 에 `X-Admin-Key` 필요). POST 용 키와 분리돼 있어 **삭제 키를 켜도 이미 배포된 앱의 기록(POST)은 영향받지 않는다.** 삭제를 쓸 거면 `ADMIN_KEY` 설정을 권장.
 
 ### 기록 삭제 (관리용)
 브라우저 `/docs` 의 **Try it out** 또는 curl 로:
@@ -45,7 +45,7 @@ curl -X DELETE http://140.245.64.70:8081/scores \
 # 전부 삭제
 curl -X DELETE http://140.245.64.70:8081/scores/all
 
-# API_KEY 를 켰다면 두 요청 모두 -H 'X-API-Key: 키값' 을 추가
+# ADMIN_KEY 를 켰다면 두 요청 모두 -H 'X-Admin-Key: 키값' 을 추가
 ```
 응답은 `{"deleted": 삭제된_건수}`. ⚠️ 삭제는 되돌릴 수 없고, 공개 서버이므로 `API_KEY` 보호를 권장(특히 `/scores/all`).
 

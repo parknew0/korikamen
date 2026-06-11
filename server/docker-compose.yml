@@ -10,3 +10,4 @@ services:
     environment:
       - DB_PATH=/data/scores.db
       - API_KEY=${API_KEY:-}         # .env 에 값을 넣으면 POST 에 X-API-Key 요구
+      - ADMIN_KEY=${ADMIN_KEY:-}     # .env 에 값을 넣으면 DELETE 에 X-Admin-Key 요구 (삭제 보호)
