@@ -27,14 +27,14 @@ body{
     justify-content:center;
     align-items:flex-start;
 
-    padding-top:180px;
+    padding-top:110px;
 }
 
 .container{
     width:100%;
     max-width:900px;
 
-    height:75vh;
+    height:calc(100vh - 140px); /* 화면에 맞춰 채워 하단(5·6위)이 잘리지 않게 */
 
     display:flex;
     flex-direction:column;
@@ -50,7 +50,7 @@ body{
 
 .title{
     text-align:center;
-    margin-bottom:40px;
+    margin-bottom:24px;
 
     color:white;
 }
@@ -85,7 +85,7 @@ body{
     justify-content:center;
     gap:20px;
 
-    margin-bottom:40px;
+    margin-bottom:24px;
 }
 
 .podium-card{
@@ -104,7 +104,7 @@ body{
     color:#e2e8f0;
     font-family:monospace;
 
-    margin-bottom:30px;
+    margin-bottom:18px;
 }
 
 .medal{
