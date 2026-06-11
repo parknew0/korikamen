@@ -170,9 +170,9 @@ func topRanks(limit: Int = 20) async throws -> [Rank] {
 
 ---
 
-## 7. GitHub Actions 자동 배포 (선택)
+## 7. GitHub Actions 수동 배포 (선택)
 
-`main` 의 `server/` 가 바뀌면 OCI 서버에 자동으로 재배포된다(`.github/workflows/deploy-ranking.yml`).
+Actions 탭에서 **Run workflow** 를 누르면 OCI 서버에 배포된다(`.github/workflows/deploy-ranking.yml`). **자동(push) 배포는 끄고 수동 실행 전용**이다.
 동작: 체크아웃 → `server/` 를 서버 `~/korikamen-ranking` 로 복사 → 그 폴더에서 `docker compose up -d --build`.
 
 ### 넣어야 할 GitHub Secrets
@@ -193,4 +193,4 @@ func topRanks(limit: Int = 20) async throws -> [Rank] {
 - Actions 가 쓸 SSH **공개키**를 서버 `~/.ssh/authorized_keys` 에 등록. 그 짝인 **개인키**를 `OCI_SSH_KEY` Secret 에 넣는다. (인스턴스 만들 때 쓴 키를 재사용해도 되지만, CI 전용 키페어를 새로 만드는 편이 더 안전)
 - 방화벽 2겹에 포트 개방 (§4-3).
 
-> 처음엔 Actions 탭에서 **Run workflow**(수동 실행)로 한 번 돌려 SSH·배포가 되는지 확인한 뒤, 이후 push 자동 배포를 쓰면 된다.
+> 배포가 필요할 때마다 Actions 탭에서 **Run workflow** 를 누른다. (워크플로가 `main` 에 있어야 버튼이 보인다.)

@@ -1,13 +1,8 @@
 name: Deploy Ranking Server
 
-# main 의 server/ 가 바뀌면 OCI 서버에 자동 배포한다.
-# 수동 실행도 가능: 레포 → Actions 탭 → 이 워크플로 → Run workflow.
+# OCI 서버에 랭킹 서버를 배포한다. 수동 실행 전용(자동 배포 없음):
+# 레포 → Actions 탭 → "Deploy Ranking Server" → Run workflow.
 on:
-  push:
-    branches: [main]
-    paths:
-      - "server/**"
-      - ".github/workflows/deploy-ranking.yml"
   workflow_dispatch:
 
 concurrency:
