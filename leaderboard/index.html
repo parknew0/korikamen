@@ -292,8 +292,15 @@ body{
 <script>
 
 // ===== 설정 =====
-const API_URL    = "http://140.245.64.70:8081/scores?limit=100"; // 서버 주소 (limit 으로 표시 인원 조절)
-const REFRESH_MS = 5000;                                          // 자동 갱신 주기(ms)
+// 로컬(파일/localhost)에선 서버에 직접, 배포(Vercel HTTPS)에선 같은 도메인 프록시(/api)로 호출
+// → 배포 시 Mixed Content(HTTPS 페이지가 HTTP API 호출) 차단을 피한다. 프록시 규칙은 vercel.json.
+const isLocal    = location.protocol === "file:"
+                || location.hostname === "localhost"
+                || location.hostname === "127.0.0.1";
+const API_URL    = isLocal
+    ? "http://140.245.64.70:8081/scores?limit=100"  // 로컬: 서버 직접
+    : "/api/scores?limit=100";                       // 배포: Vercel 프록시 경유(vercel.json)
+const REFRESH_MS = 5000;                             // 자동 갱신 주기(ms)
 
 // ===== 유틸 =====
 function formatTime(ms){
