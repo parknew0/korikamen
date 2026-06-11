@@ -27,14 +27,14 @@ body{
     justify-content:center;
     align-items:flex-start;
 
-    padding-top:110px;
+    padding-top:14vh; /* 상단 로고가 가려지지 않게 컨테이너를 아래로 */
 }
 
 .container{
     width:100%;
     max-width:900px;
 
-    height:calc(100vh - 140px); /* 화면에 맞춰 채워 하단(5·6위)이 잘리지 않게 */
+    height:78vh; /* 화면 높이의 78%만 차지해 위(로고)·아래로 배경이 보이게 */
 
     display:flex;
     flex-direction:column;
@@ -43,7 +43,7 @@ body{
     backdrop-filter:blur(8px);
 
     border-radius:24px;
-    padding:40px;
+    padding:30px;
 
     color:white;
 }
@@ -141,7 +141,7 @@ body{
 }
 
 .first .block{
-    height:180px;
+    height:150px;
     background:linear-gradient(
         180deg,
         #ffd700,
@@ -151,7 +151,7 @@ body{
 }
 
 .second .block{
-    height:150px;
+    height:125px;
     background:linear-gradient(
         180deg,
         #d8d8d8,
@@ -161,7 +161,7 @@ body{
 }
 
 .third .block{
-    height:120px;
+    height:100px;
     background:linear-gradient(
         180deg,
         #cd7f32,
