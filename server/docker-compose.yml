@@ -1,0 +1,12 @@
+services:
+  ranking:
+    build: .
+    container_name: korikamen-ranking
+    restart: unless-stopped          # 크래시·재부팅 시 자동 복구
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data:/data                 # SQLite 파일 영속화
+    environment:
+      - DB_PATH=/data/scores.db
+      - API_KEY=${API_KEY:-}         # .env 에 값을 넣으면 POST 에 X-API-Key 요구
