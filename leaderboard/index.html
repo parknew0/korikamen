@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>🏆 Leaderboard</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    height:100vh;
+    overflow:hidden;
+
+    background-image:url("leaderboard_background.png");
+    background-size:cover;
+    background-position:center top;
+    background-repeat:no-repeat;
+    background-color:#0b0b10; /* 배경 이미지가 없을 때 대비 */
+
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+
+    padding-top:180px;
+}
+
+.container{
+    width:100%;
+    max-width:900px;
+
+    height:75vh;
+
+    display:flex;
+    flex-direction:column;
+
+    background:rgba(0,0,0,0.70);
+    backdrop-filter:blur(8px);
+
+    border-radius:24px;
+    padding:40px;
+
+    color:white;
+}
+
+.title{
+    text-align:center;
+    margin-bottom:40px;
+
+    color:white;
+}
+
+.title h1{
+    font-size:3rem;
+    margin-bottom:10px;
+
+    color:white;
+}
+
+.title p{
+    color:#94a3b8;
+}
+
+/* 연결 상태 표시 (정상일 땐 숨김) */
+.status{
+    text-align:center;
+    margin-bottom:16px;
+    color:#fca5a5;
+    font-size:0.95rem;
+    min-height:1.2em;
+}
+
+/* =======================
+   PODIUM
+======================= */
+
+.podium{
+    display:flex;
+    align-items:flex-end;
+    justify-content:center;
+    gap:20px;
+
+    margin-bottom:40px;
+}
+
+.podium-card{
+    text-align:center;
+    width:180px;
+}
+
+.podium-card .name{
+    font-weight:bold;
+    font-size:1.3rem;
+
+    margin-bottom:12px;
+}
+
+.podium-card .time{
+    color:#e2e8f0;
+    font-family:monospace;
+
+    margin-bottom:30px;
+}
+
+.medal{
+    font-size:3rem;
+    margin-bottom:10px;
+}
+
+.block{
+    border-radius:16px 16px 0 0;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:2rem;
+    font-weight:bold;
+}
+
+.podium-content{
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+}
+
+.podium-medal{
+    font-size:2rem;
+    margin-bottom:10px;
+}
+
+.podium-rank{
+    font-size:2rem;
+    font-weight:bold;
+}
+
+.first .block{
+    height:180px;
+    background:linear-gradient(
+        180deg,
+        #ffd700,
+        #d4a900
+    );
+    color:#e8e8e8;
+}
+
+.second .block{
+    height:150px;
+    background:linear-gradient(
+        180deg,
+        #d8d8d8,
+        #9e9e9e
+    );
+    color:#e8e8e8;
+}
+
+.third .block{
+    height:120px;
+    background:linear-gradient(
+        180deg,
+        #cd7f32,
+        #8f5422
+    );
+    color:#e8e8e8;
+}
+
+/* =======================
+   RANK LIST
+======================= */
+
+.rank-list{
+    flex:1;
+
+    overflow-y:auto;
+
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+}
+
+.rank-item{
+    background:rgba(255,255,255,0.08);
+
+    border:1px solid rgba(255,255,255,0.08);
+
+    border-radius:16px;
+
+    padding:18px 24px;
+
+    display:flex;
+    align-items:center;
+
+    backdrop-filter:blur(10px);
+
+    transition:0.2s;
+}
+
+.rank-item:hover{
+    transform:translateY(-2px);
+}
+
+.rank{
+    width:60px;
+    font-weight:bold;
+    font-size:1.2rem;
+}
+
+.nickname{
+    flex:1;
+    font-size:1.1rem;
+}
+
+.score{
+    font-family:monospace;
+    font-size:1.1rem;
+    font-weight:bold;
+}
+
+.rank-list::-webkit-scrollbar{
+    width:8px;
+}
+
+.rank-list::-webkit-scrollbar-track{
+    background:rgba(0,0,0,0.10);
+}
+
+.rank-list::-webkit-scrollbar-thumb{
+    background:rgba(194, 194, 194, 0.5);
+    border-radius:999px;
+}
+
+.rank-list::-webkit-scrollbar-thumb:hover{
+    background:rgba(246, 245, 245, 0.7);
+}
+
+/* =======================
+   MOBILE
+======================= */
+
+@media(max-width:700px){
+
+    .podium{
+        gap:10px;
+    }
+
+    .podium-card{
+        width:110px;
+    }
+
+    .first .block{
+        height:180px;
+    }
+
+    .second .block{
+        height:130px;
+    }
+
+    .third .block{
+        height:100px;
+    }
+
+    .title h1{
+        font-size:2rem;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="title">
+        <h1>🏆 LEADERBOARD</h1>
+        <p>최고 기록 순</p>
+    </div>
+
+    <div id="status" class="status"></div>
+
+    <div id="podium" class="podium"></div>
+
+    <div id="rankList" class="rank-list"></div>
+
+</div>
+
+<script>
+
+// ===== 설정 =====
+const API_URL    = "http://140.245.64.70:8081/scores?limit=100"; // 서버 주소 (limit 으로 표시 인원 조절)
+const REFRESH_MS = 5000;                                          // 자동 갱신 주기(ms)
+
+// ===== 유틸 =====
+function formatTime(ms){
+    const minutes      = Math.floor(ms / 60000);
+    const seconds      = Math.floor((ms % 60000) / 1000);
+    const milliseconds = ms % 1000;
+    return `${minutes}:${String(seconds).padStart(2,'0')}.${String(milliseconds).padStart(3,'0')}`;
+}
+
+// 닉네임을 안전하게 출력(XSS·태그 깨짐 방지)
+function escapeHtml(text){
+    const div = document.createElement("div");
+    div.textContent = text ?? "";
+    return div.innerHTML;
+}
+
+function setStatus(message){
+    document.getElementById("status").textContent = message;
+}
+
+// ===== 렌더링 =====
+function createPodium(players){
+    const podium = document.getElementById("podium");
+
+    function card(player, place, medal, className){
+        if(!player) return "";
+        return `
+            <div class="podium-card ${className}">
+                <div class="name">${escapeHtml(player.nickname)}</div>
+                <div class="time">${formatTime(player.timeMs)}</div>
+                <div class="block">
+                    <div class="podium-content">
+                        <div class="podium-medal">${medal}</div>
+                        <div class="podium-rank">${place}</div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    // 가운데가 1위가 되도록 2-1-3 순서로 배치
+    podium.innerHTML =
+        card(players[1], 2, "🥈", "second") +
+        card(players[0], 1, "🥇", "first")  +
+        card(players[2], 3, "🥉", "third");
+}
+
+function createRankList(players){
+    const rankList = document.getElementById("rankList");
+    rankList.innerHTML = "";
+
+    players.slice(3).forEach(player=>{
+        const row = document.createElement("div");
+        row.className = "rank-item";
+        row.innerHTML = `
+            <div class="rank">#${player.rank}</div>
+            <div class="nickname">${escapeHtml(player.nickname)}</div>
+            <div class="score">${formatTime(player.timeMs)}</div>
+        `;
+        rankList.appendChild(row);
+    });
+}
+
+// ===== 데이터 로드 =====
+async function loadScores(){
+    try{
+        const response = await fetch(API_URL, { cache: "no-store" });
+        if(!response.ok) throw new Error("HTTP " + response.status);
+
+        const scores = await response.json();
+
+        // 빠른 순(오름차순) 정렬 후 순위 재부여 → 항상 1위부터 연속
+        scores.sort((a, b) => a.timeMs - b.timeMs);
+        scores.forEach((p, i) => { p.rank = i + 1; });
+
+        createPodium(scores);
+        createRankList(scores);
+        setStatus(""); // 정상이면 상태 숨김
+    }catch(error){
+        console.error("FETCH ERROR:", error);
+        // 실패해도 화면(직전 데이터)은 유지하고 상태만 표시 → 다음 주기에 자동 복구
+        setStatus("서버 연결 실패 — 재시도 중… (" + error.message + ")");
+    }
+}
+
+loadScores();
+setInterval(loadScores, REFRESH_MS);
+
+</script>
+
+</body>
+</html>

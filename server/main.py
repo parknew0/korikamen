@@ -3,6 +3,7 @@ import sqlite3
 from contextlib import asynccontextmanager, contextmanager
 
 from fastapi import Depends, FastAPI, Header, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 # 환경 변수로 운영 값 주입 (Docker / .env 에서 설정)
@@ -44,6 +45,14 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="Korikamen Ranking API", version="1.0.0", lifespan=lifespan)
+
+# 브라우저(웹 리더보드 등)에서 fetch 할 수 있도록 CORS 허용. 공개 읽기 API라 모든 출처 허용.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 class ScoreIn(BaseModel):
