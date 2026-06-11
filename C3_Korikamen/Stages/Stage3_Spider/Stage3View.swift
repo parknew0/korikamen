@@ -93,6 +93,7 @@ struct Stage3View: View { // 맥스 바보
         }
     }
 
+    #if DEBUG
     // 우측 하단 버튼 (테스트용으로 거미줄 제거 단계에서만 보이도록 설정)
     private var bottomButtons: some View {
         Group {
@@ -105,6 +106,7 @@ struct Stage3View: View { // 맥스 바보
             }
         }
     }
+    #endif
 
     // 씬별 가운데 내용 (scene 전한 구조로 정리)
     @ViewBuilder private var sceneContent: some View {
@@ -217,7 +219,9 @@ struct Stage3View: View { // 맥스 바보
         ZStack{
             background
                 .overlay(alignment: .trailing) { rightHUD }        // 오른쪽 고정 시키기
+            #if DEBUG
                 .overlay(alignment: .bottomTrailing) { bottomButtons } // 마찬가지로 우측 하단에 고정
+            #endif
             sceneContent
                 .overlay(alignment:.center){ arrowHint }
 
