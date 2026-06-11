@@ -12,7 +12,8 @@ struct MainView: View {
     @State private var showTutorial = false
     @State private var hasShownTutorial = false //최초 1회 판단
     @State private var startAfterTutorial = false // 닫으면 게임 시작될 지 여부
-    
+    @State private var showRanking = false // 랭킹 화면 표시 여부
+
     var body: some View {
         ZStack {
             // 타이틀 — 상단 중앙
@@ -31,7 +32,7 @@ struct MainView: View {
                 } else {startAfterTutorial = true
                     withAnimation { showTutorial = true } //최초 1회 튜토리얼
                 }
-                    
+
                 } label: {
                     Image("btn_start_middledown_square_gold")
                         .resizable().scaledToFit().frame(width: 150)
@@ -40,10 +41,10 @@ struct MainView: View {
                 .padding(.bottom, 60)
             }
 
-            // 도움말 버튼 — 좌상단
+            // 상단 버튼 — 좌(도움말) / 우(랭킹)
             VStack {
                 HStack {
-                    // 변경 후: clear 리퀴드 글라스 원 위에 물음표
+                    // 도움말 — 좌상단
                     Button {
                         startAfterTutorial = false // 도움말로 연건 닫아도 시작 안되도록
                         withAnimation { showTutorial = true } } label: {
@@ -55,7 +56,21 @@ struct MainView: View {
                             .contentShape(Circle())          // ← 원 전체가 터치 영역
                     }
                     .buttonStyle(.plain)
+
                     Spacer()
+
+                    // 랭킹 — 우상단
+                    Button {
+                        showRanking = true
+                    } label: {
+                        Image(systemName: "trophy")
+                            .font(.system(size: 26, weight: .bold))
+                            .foregroundStyle(.white)
+                            .frame(width: 60, height: 60)
+                            .glassEffect(.clear.tint(.stage2PanelBackground.opacity(0.8)), in: Circle())
+                            .contentShape(Circle())
+                    }
+                    .buttonStyle(.plain)
                 }
                 Spacer()
             }
@@ -88,6 +103,8 @@ struct MainView: View {
         )
         .onAppear {MainBGM.play()}
         .onDisappear {MainBGM.stop()} // ← 메인 벗어나면 정지
+        .fullScreenCover(isPresented: $showRanking) {
+            RankingView(onClose: { showRanking = false })
+        }
     }
 }
-
