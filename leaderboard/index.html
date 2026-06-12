@@ -245,6 +245,20 @@ body{
 
 @media(max-width:700px){
 
+    /* 모바일: 헤더·podium·순위목록을 컨테이너째로 스크롤한다.
+       → 큰 1·2·3위 podium에 가려 안 보이던 4위 이하 순위까지 스크롤로 확인.
+         (데스크톱은 화면이 넉넉해 기존처럼 podium 고정 + 목록만 스크롤) */
+    .container{
+        overflow-y:auto;
+        -webkit-overflow-scrolling:touch; /* 구형 iOS 관성 스크롤 */
+    }
+
+    /* 목록 자체 스크롤·세로 확장을 끄고 자연 높이로 → 컨테이너가 전체를 스크롤 */
+    .rank-list{
+        flex:none;
+        overflow-y:visible;
+    }
+
     .podium{
         gap:10px;
     }
